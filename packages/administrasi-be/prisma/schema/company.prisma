@@ -1,0 +1,16 @@
+model Company {
+    id                String             @id @default(uuid())
+    name              String
+    address           String
+    email             String
+    phone             String
+    createdAt         DateTime           @default(now())
+    updatedAt         DateTime           @default(now())
+    memberWorkResults MemberWorkResult[]
+    activities        Activity[]
+    employees         Employee[]
+    invoices          Invoice[]
+    roleCompanies     RoleCompanies[]
+    notifications     Notification[]
+    Accounting        Accounting[]
+}

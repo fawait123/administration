@@ -1,0 +1,64 @@
+model Invoice {
+    id                 String              @id @default(uuid())
+    number             String
+    companyId          String
+    createdAt          DateTime            @default(now())
+    updatedAt          DateTime            @default(now())
+    invoiceActivities  InvoiceActivity[]
+    invoiceAdditionals InvoiceAdditional[]
+    Company            Company?            @relation(fields: [companyId], references: [id])
+    type               InvoiceType?        @default(ACTIVITY)
+    status             Boolean             @default(false)
+    Accounting         Accounting[]
+}
+
+model InvoiceActivity {
+    id         String                  @id @default(uuid())
+    bapNumber  String
+    zone       String
+    wide       Int
+    price      Int
+    total      Int
+    status     InvoiceStatus?          @default(NEEDAPPROVAL)
+    createdAt  DateTime                @default(now())
+    updatedAt  DateTime                @default(now())
+    activityId String
+    activity   Activity?               @relation(fields: [activityId], references: [id])
+    details    InvoiceActivityDetail[]
+    Invoice    Invoice?                @relation(fields: [invoiceId], references: [id])
+    invoiceId  String?
+}
+
+model InvoiceActivityDetail {
+    id                         String                    @id @default(uuid())
+    invoiceActivityId          String
+    memberWorkResultActivityId String
+    createdAt                  DateTime                  @default(now())
+    updatedAt                  DateTime                  @default(now())
+    invoiceActivity            InvoiceActivity?          @relation(fields: [invoiceActivityId], references: [id])
+    memberWorkResultActivity   MemberWorkResultActivity? @relation(fields: [memberWorkResultActivityId], references: [id])
+}
+
+model InvoiceAdditional {
+    id         String        @id @default(uuid())
+    bapNumber  String
+    amount     Int
+    status     InvoiceStatus @default(NEEDAPPROVAL)
+    createdAt  DateTime      @default(now())
+    updatedAt  DateTime      @default(now())
+    activityId String
+    invoiceId  String
+    invoice    Invoice?      @relation(fields: [invoiceId], references: [id])
+    activity   Activity?     @relation(fields: [activityId], references: [id])
+}
+
+enum InvoiceType {
+    ACTIVITY
+    ADDITIONAL
+}
+
+enum InvoiceStatus {
+    NEEDAPPROVAL
+    REJECT
+    APPROVE
+}

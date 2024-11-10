@@ -1,0 +1,25 @@
+model Accounting {
+    id               String             @id @default(uuid())
+    date             DateTime           @db.Date
+    invoiceId        String
+    companyId        String
+    company          Company?           @relation(fields: [companyId], references: [id])
+    invoice          Invoice?           @relation(fields: [invoiceId], references: [id])
+    createdAt        DateTime           @default(now())
+    updatedAt        DateTime           @default(now())
+    AccountingDetail AccountingDetail[]
+}
+
+model AccountingDetail {
+    id             String      @id @default(uuid())
+    accountingId   String
+    name           String
+    percentage     Decimal
+    subTotal       Int
+    expenses       Int
+    income         Int
+    expenseDetails Json?
+    accounting     Accounting? @relation(fields: [accountingId], references: [id])
+    createdAt      DateTime    @default(now())
+    updatedAt      DateTime    @default(now())
+}

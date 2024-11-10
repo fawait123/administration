@@ -1,0 +1,19 @@
+model Role {
+    id        String          @id @default(uuid())
+    name      String
+    users     User[]
+    access    Json            @default("[]")
+    createdAt DateTime        @default(now())
+    updatedAt DateTime        @default(now())
+    companies RoleCompanies[]
+}
+
+model RoleCompanies {
+    id        String   @id @default(uuid())
+    roleId    String
+    companyId String
+    role      Role?    @relation(fields: [roleId], references: [id])
+    company   Company? @relation(fields: [companyId], references: [id])
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now())
+}
