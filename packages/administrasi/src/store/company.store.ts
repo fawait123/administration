@@ -10,7 +10,19 @@ export const useCompanyStore = defineStore('company', {
         loading: false,
         data: [],
         default: localStorage.getItem('company') || null
-    }),
+    }) as {
+        loading: boolean,
+        data: {
+            address: string,
+            createdAt: string,
+            email: string,
+            id: string,
+            name: string,
+            phone: string,
+            updatedAt: string
+        }[],
+        default: string | null
+    },
     actions: {
         async getData() {
             this.loading = true;
