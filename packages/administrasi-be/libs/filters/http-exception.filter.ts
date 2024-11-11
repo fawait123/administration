@@ -24,7 +24,7 @@ export class HttpExeptionFilter<T> implements ExceptionFilter {
             path: request.url,
             message:
                 exception instanceof HttpException
-                    ? exception.getResponse()
+                    ? exception.message
                     : exception instanceof PrismaClientKnownRequestError ? this.prismaError(exception) : 'Internal server error',
         };
 
