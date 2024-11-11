@@ -35,6 +35,9 @@ class InvoiceActivity {
     @IsArray()
     @Type(() => InvoiceActivityDetail)
     details: InvoiceActivityDetail[]
+
+    @IsOptional()
+    id: string | null
 }
 
 
@@ -50,6 +53,9 @@ class InvoiceAdditionals {
     @IsNotEmpty()
     @IsNumber()
     amount: number;
+
+    @IsOptional()
+    id: string | null
 }
 
 

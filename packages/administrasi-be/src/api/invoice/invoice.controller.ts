@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
 import { InvoiceService } from './invoice.service';
 import { CreateInvoiceAddtionalDto, CreateInvoiceDto } from './dto/create-invoice.dto';
-import { UpdateInvoiceDto } from './dto/update-invoice.dto';
+import { UpdateInvoiceAdditonalDto, UpdateInvoiceDto } from './dto/update-invoice.dto';
 import { InvoiceStatus, Prisma } from '@prisma/client';
 import { PaginationDto } from 'libs/dto/pagination.dto';
 import { CompanyContext } from 'libs/decorators/company.decorator';
@@ -61,11 +61,26 @@ export class InvoiceController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateInvoiceDto: UpdateInvoiceDto) {
-    return this.invoiceService.update(+id, updateInvoiceDto);
+    return this.invoiceService.update(id, updateInvoiceDto);
+  }
+
+  @Patch('additional/:id')
+  updateAdditional(@Param('id') id: string, @Body() updateInvoiceDto: UpdateInvoiceAdditonalDto) {
+    return this.invoiceService.updateAdditional(id, updateInvoiceDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.invoiceService.remove(+id);
+    return this.invoiceService.remove(id);
+  }
+
+  @Delete('activities/:id')
+  deleteActivities(@Param('id') id: string) {
+    return this.invoiceService.deleteActivity(id)
+  }
+
+  @Delete('additional/:id')
+  deleteAdditional(@Param('id') id: string) {
+    return this.invoiceService.deleteAdditional(id)
   }
 }

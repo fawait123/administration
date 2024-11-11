@@ -110,6 +110,7 @@ const deleteuser = async () => {
         toast.add({ severity: 'success', summary: 'Berhasil', detail: 'Data berhasil dihapus', life: 3000 });
         getData()
     } catch (error: any) {
+        deleteuserDialog.value = false;
         toast.add({ severity: 'error', summary: 'Terjadi kesalahan', detail: ResponseMessage.message(error), life: 3000 });
     }
 }

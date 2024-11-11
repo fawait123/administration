@@ -85,6 +85,11 @@ const router = createRouter({
                             component: () => import('@/views/invoice/detail.vue')
                         },
                         {
+                            path: '/invoice/edit/:id',
+                            name: 'invoice-edit',
+                            component: () => import('@/views/invoice/edit.vue')
+                        },
+                        {
                             path: '/invoice/form',
                             name: 'invoice-form',
                             component: () => import('@/views/invoice/form.vue')

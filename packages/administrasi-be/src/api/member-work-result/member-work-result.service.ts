@@ -79,7 +79,7 @@ export class MemberWorkResultService {
     query: PaginationDto,
     company: Prisma.CompanyCreateInput
   ) {
-    return paginate<Prisma.MemberWorkResultFindManyArgs>(this.primaService.memberWorkResult, new StatementScopeHelper<Prisma.MemberWorkResultFindManyArgs>({ params: query }, ['name']), {
+    return paginate<Prisma.MemberWorkResultFindManyArgs>(this.primaService.memberWorkResult, new StatementScopeHelper<Prisma.MemberWorkResultFindManyArgs>({ params: query }, ['date']), {
       include: {
         employee: true,
         company: true
@@ -100,11 +100,11 @@ export class MemberWorkResultService {
         },
         activity: true
       },
-      where: {
-        id: {
-          notIn: (await this.primaService.$queryRaw<(Record<string, any>)[]>`select memberWorkResultActivityId from InvoiceActivityDetail`).map((item) => item.memberWorkResultActivityId)
-        }
-      }
+      // where: {
+      //   id: {
+      //     notIn: (await this.primaService.$queryRaw<(Record<string, any>)[]>`select memberWorkResultActivityId from InvoiceActivityDetail`).map((item) => item.memberWorkResultActivityId)
+      //   }
+      // }
     })
 
     return new ResponseHelper({ data: activities })

@@ -1,6 +1,6 @@
-import { BadGatewayException, Injectable } from '@nestjs/common';
+import { BadGatewayException, BadRequestException, Injectable } from '@nestjs/common';
 import { CreateInvoiceAddtionalDto, CreateInvoiceDto } from './dto/create-invoice.dto';
-import { UpdateInvoiceDto } from './dto/update-invoice.dto';
+import { UpdateInvoiceAdditonalDto, UpdateInvoiceDto } from './dto/update-invoice.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ResponseHelper } from 'libs/helpers/response.helper';
 import { InvoiceStatus, Prisma } from '@prisma/client';
@@ -208,7 +208,8 @@ export class InvoiceService {
       include: {
         invoiceActivities: {
           include: {
-            activity: true
+            activity: true,
+            details: true
           }
         },
         invoiceAdditionals: {
@@ -222,11 +223,177 @@ export class InvoiceService {
     return new ResponseHelper({ data: invoice })
   }
 
-  update(id: number, updateInvoiceDto: UpdateInvoiceDto) {
-    return `This action updates a #${id} invoice`;
+  async update(id: string, updateInvoiceDto: UpdateInvoiceDto) {
+    const transaction = await this.prismaService.$transaction(async (t) => {
+      const invoice = await t.invoice.update({
+        data: {
+          number: updateInvoiceDto.number,
+          companyId: updateInvoiceDto.companyId,
+        },
+        where: {
+          id
+        }
+      });
+      console.log(updateInvoiceDto)
+      const activity = await Promise.all(
+        updateInvoiceDto.invoiceActivites.map(async (item) => {
+          if (item.id != null) {
+            await t.invoiceActivityDetail.deleteMany({
+              where: {
+                invoiceActivityId: item.id
+              }
+            })
+            await t.invoiceActivity.update({
+              data: {
+                bapNumber: item.bapNumber,
+                price: item.price,
+                total: item.total,
+                wide: item.wide,
+                zone: item.zone,
+                activityId: item.activityId,
+                details: {
+                  create: item.details.map((det) => {
+                    return {
+                      memberWorkResultActivityId: det.memberWorkResultId
+                    }
+                  })
+                }
+              },
+              where: {
+                id: item.id
+              }
+            })
+          } else {
+            await t.invoiceActivity.create({
+              data: {
+                invoiceId: invoice.id,
+                bapNumber: item.bapNumber,
+                price: item.price,
+                total: item.total,
+                wide: item.wide,
+                zone: item.zone,
+                activityId: item.activityId,
+                details: {
+                  create: item.details.map((det) => {
+                    return {
+                      memberWorkResultActivityId: det.memberWorkResultId
+                    }
+                  })
+                }
+              }
+            })
+          }
+        })
+      )
+
+      return { invoice, activity }
+    })
+
+    return new ResponseHelper({ data: transaction })
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} invoice`;
+  async updateAdditional(id: string, updateInvoiceDto: UpdateInvoiceAdditonalDto) {
+    const transaction = await this.prismaService.$transaction(async (t) => {
+      const invoice = await t.invoice.update({
+        data: {
+          number: updateInvoiceDto.number,
+          companyId: updateInvoiceDto.companyId,
+          type: 'ADDITIONAL',
+        },
+        where: {
+          id
+        }
+      });
+
+      const additonals = await Promise.all(
+        updateInvoiceDto.invoiceAdditionals.map(async (item) => {
+          if (item.id != null) {
+            await t.invoiceAdditional.update({
+              data: {
+                bapNumber: item.bapNumber,
+                activityId: item.activityId,
+                amount: item.amount,
+              },
+              where: {
+                id: item.id
+              }
+            })
+          } else {
+            await t.invoiceAdditional.create({
+              data: {
+                bapNumber: item.bapNumber,
+                activityId: item.activityId,
+                amount: item.amount,
+                invoiceId: invoice.id
+              }
+            })
+          }
+        })
+      )
+
+      return { invoice, additonals }
+    })
+
+    return new ResponseHelper({ data: transaction })
+  }
+
+  async remove(id: string) {
+    const exist = await this.prismaService.invoice.findFirst({
+      where: {
+        id
+      }
+    })
+
+    if (!exist) {
+      throw new BadRequestException('Data tidak ditemukan')
+    }
+
+    await this.prismaService.$transaction(async (t) => {
+      await t.invoiceAdditional.deleteMany({
+        where: {
+          invoiceId: id
+        }
+      })
+
+      await t.invoiceActivity.deleteMany({
+        where: {
+          invoiceId: id
+        }
+      })
+
+      await t.invoice.delete({
+        where: {
+          id
+        }
+      })
+    })
+
+    return new ResponseHelper({ data: true })
+  }
+
+  async deleteActivity(id: string) {
+    await this.prismaService.invoiceActivityDetail.deleteMany({
+      where: {
+        invoiceActivityId: id
+      }
+    })
+
+    await this.prismaService.invoiceActivity.delete({
+      where: {
+        id
+      }
+    })
+
+    return new ResponseHelper({ data: true })
+  }
+
+  async deleteAdditional(id: string) {
+    await this.prismaService.invoiceAdditional.delete({
+      where: {
+        id
+      }
+    })
+
+    return new ResponseHelper({ data: true })
   }
 }

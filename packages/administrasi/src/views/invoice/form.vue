@@ -59,10 +59,10 @@ document.addEventListener('keydown', (event) => {
                 </TabList>
                 <TabPanels>
                     <TabPanel value="0">
-                        <ActivityForm :total-data="totalData" ref="activityComponent" />
+                        <ActivityForm :edit="false" :total-data="totalData" ref="activityComponent" />
                     </TabPanel>
                     <TabPanel value="1">
-                        <AdditionalForm :total-data="totalData" ref="additionalComponent" />
+                        <AdditionalForm :edit="false" :total-data="totalData" ref="additionalComponent" />
                     </TabPanel>
                 </TabPanels>
             </Tabs>

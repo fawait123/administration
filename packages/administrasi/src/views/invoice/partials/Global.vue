@@ -3,6 +3,9 @@ import DataTableComponent, { type IColumnTable } from '@/composable/DataTableCom
 import { markRaw, ref } from 'vue';
 import InvoiceItem from './InvoiceItem.vue';
 import InvoiceType from './InvoiceType.vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter()
 
 const tableRef = ref<InstanceType<typeof DataTableComponent> | null>(null)
 const columns = ref<IColumnTable[]>([
@@ -25,6 +28,10 @@ const columns = ref<IColumnTable[]>([
     },
 ])
 
+const handleEdit = (data: Record<string, any>) => {
+    router.push({ name: 'invoice-edit', params: { id: data.id } },)
+}
+
 
 defineExpose({ tableRef })
 </script>
@@ -32,7 +39,7 @@ defineExpose({ tableRef })
 
 <template>
     <div>
-        <DataTableComponent get-url="invoice" ref="tableRef" :columns="columns" :add-button="false"
+        <DataTableComponent @onEdit="handleEdit" get-url="invoice" ref="tableRef" :columns="columns" :add-button="false"
             :delete-button="false" />
     </div>
 </template>
