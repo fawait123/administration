@@ -7,25 +7,24 @@ import doRequest from '@/helpers/do-request.helper';
 import { useRoute } from 'vue-router';
 import { useToast } from 'primevue/usetoast';
 
-const toast = useToast()
+const toast = useToast();
 
-const route = useRoute()
-const tabRef = ref<string>("0")
-const openModal = ref<boolean>(false)
-const totalData = ref<number>(1)
-const activityComponent = ref<InstanceType<typeof ActivityForm> | null>(null)
-const additionalComponent = ref<InstanceType<typeof AdditionalForm> | null>(null)
-const editData = ref<Record<string, any> | null>(null)
-
+const route = useRoute();
+const tabRef = ref<string>('0');
+const openModal = ref<boolean>(false);
+const totalData = ref<number>(1);
+const activityComponent = ref<InstanceType<typeof ActivityForm> | null>(null);
+const additionalComponent = ref<InstanceType<typeof AdditionalForm> | null>(null);
+const editData = ref<Record<string, any> | null>(null);
 
 const getById = async () => {
     try {
         const response = await doRequest({
             method: 'get',
             url: 'invoice/' + route.params.id
-        })
+        });
 
-        const data = response.data
+        const data = response.data;
         editData.value = data;
         if (activityComponent.value) {
             activityComponent.value.formRef = {
@@ -39,16 +38,33 @@ const getById = async () => {
                         price: item.price?.toString(),
                         total: item.total?.toString(),
                         details: item.details.map((el: any) => el.memberWorkResultActivityId),
-                        id: item.id
-                    }
-                })
-            }
+                        id: item.id,
+                        retensi: item.retensi
+                    };
+                }),
+                invoiceRetensi:
+                    data.invoiceRetensi.length > 0
+                        ? data.invoiceRetensi.map((item: any) => {
+                              return {
+                                  amount: item.amount,
+                                  note: item.note,
+                                  id: item.id
+                              };
+                          })
+                        : [
+                              {
+                                  amount: '0',
+                                  note: '',
+                                  id: null
+                              }
+                          ]
+            };
             activityComponent.value.selectedOptions = data.invoiceActivities.map((item: any, i: number) => {
                 return {
                     index: i,
                     id: item.activityId
-                }
-            })
+                };
+            });
         }
 
         if (additionalComponent.value) {
@@ -59,43 +75,42 @@ const getById = async () => {
                         activityId: item.activityId,
                         bapNumber: item.bapNumber,
                         amount: item.amount?.toString(),
-                        id: item.id
-                    }
+                        id: item.id,
+                        rent: item.rent
+                    };
                 })
-
-            }
+            };
             additionalComponent.value.selectedOptions = data.invoiceAdditionals.map((item: any, i: number) => {
                 return {
                     index: i,
                     id: item.activityId
-                }
-            })
+                };
+            });
         }
-
     } catch (error) {
-        console.log(error)
+        console.log(error);
     }
-}
+};
 
 onMounted(() => {
-    getById()
-})
+    getById();
+});
 
 const changeTab = (value: any) => {
-    tabRef.value = value
-}
+    tabRef.value = value;
+};
 
 const pressOk = () => {
-    if (activityComponent.value && tabRef.value == "0") {
-        activityComponent.value.generateDataActivity()
+    if (activityComponent.value && tabRef.value == '0') {
+        activityComponent.value.generateDataActivity();
     }
 
-    if (additionalComponent.value && tabRef.value == "1") {
-        additionalComponent.value.generateDataBon()
+    if (additionalComponent.value && tabRef.value == '1') {
+        additionalComponent.value.generateDataBon();
     }
 
     openModal.value = false;
-}
+};
 
 document.addEventListener('keydown', (event) => {
     // Cek apakah tombol Ctrl ditekan
@@ -105,39 +120,38 @@ document.addEventListener('keydown', (event) => {
         // Tambahkan aksi lain di sini
         openModal.value = true;
     }
-})
+});
 
 const handleDelete = async () => {
     try {
         if (activityComponent.value) {
             await doRequest({
-                url: "/invoice/activities/" + activityComponent.value.dataTobeDeleted.id,
+                url: '/invoice/activities/' + activityComponent.value.dataTobeDeleted.id,
                 method: 'delete'
-            })
-            getById()
-            activityComponent.value.dataTobeDeleted = null
+            });
+            getById();
+            activityComponent.value.dataTobeDeleted = null;
             activityComponent.value.deleteModal = false;
         }
     } catch (error: any) {
-        toast.add({ severity: 'error', summary: 'Terjadi kesalahan', detail: error.message, life: 3000 })
+        toast.add({ severity: 'error', summary: 'Opps!', detail: error.message, life: 3000 });
     }
-}
+};
 
 const deleteAdditional = async (data: Record<string, any>) => {
     try {
         if (additionalComponent.value) {
             await doRequest({
-                url: "/invoice/additional/" + data.id,
+                url: '/invoice/additional/' + data.id,
                 method: 'delete'
-            })
-            getById()
+            });
+            getById();
             additionalComponent.value.deleteModal = false;
         }
     } catch (error: any) {
-        toast.add({ severity: 'error', summary: 'Terjadi kesalahan', detail: error.message, life: 3000 })
+        toast.add({ severity: 'error', summary: 'Opps!', detail: error.message, life: 3000 });
     }
-}
-
+};
 </script>
 
 <template>
@@ -161,12 +175,10 @@ const deleteAdditional = async (data: Record<string, any>) => {
                 </TabList>
                 <TabPanels>
                     <TabPanel value="0">
-                        <ActivityForm @deleteActivity="handleDelete" :edit="true" :total-data="totalData"
-                            ref="activityComponent" />
+                        <ActivityForm @deleteActivity="handleDelete" :edit="true" :total-data="totalData" ref="activityComponent" />
                     </TabPanel>
                     <TabPanel value="1">
-                        <AdditionalForm @handleDelete="deleteAdditional" :edit="true" :total-data="totalData"
-                            ref="additionalComponent" />
+                        <AdditionalForm @handleDelete="deleteAdditional" :edit="true" :total-data="totalData" ref="additionalComponent" />
                     </TabPanel>
                 </TabPanels>
             </Tabs>

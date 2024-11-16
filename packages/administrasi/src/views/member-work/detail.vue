@@ -8,48 +8,47 @@ import { computed } from 'vue';
 import { onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 
-const route = useRoute()
-const toast = useToast()
-const memberWorkResult = ref<any>({})
+const route = useRoute();
+const toast = useToast();
+const memberWorkResult = ref<any>({});
 
-const store = useLoadingStore()
+const store = useLoadingStore();
 
 onMounted(() => {
-    getData()
-})
+    getData();
+});
 
 const getData = async () => {
     try {
         const response = await doRequest({
-            url: "member-work-result/" + route.params.id,
-
-        })
-        memberWorkResult.value = response.data
+            url: 'member-work-result/' + route.params.id
+        });
+        memberWorkResult.value = response.data;
     } catch (error: any) {
-        toast.add({ severity: 'error', summary: "Terjadi Kesalahan", detail: ResponseMessage.message(error), life: 3000 })
+        toast.add({ severity: 'error', summary: 'Opps!', detail: ResponseMessage.message(error), life: 3000 });
     }
-}
+};
 
 const total = computed(() => {
     return memberWorkResult?.value?.activities?.reduce((prev: any, next: any) => {
-        return prev + next.subTotal
-    }, 0)
-})
+        return prev + next.subTotal;
+    }, 0);
+});
 
 const totalBon = computed(() => {
     return memberWorkResult?.value?.bon?.reduce((prev: any, next: any) => {
-        return prev + next.total
-    }, 0)
-})
+        return prev + next.total;
+    }, 0);
+});
 
 const downloadExcel = async () => {
-    store.setLoading(true)
+    store.setLoading(true);
     try {
         const response = await doRequest({
             url: '/worksheet/member-work-result/' + route.params.id,
             method: 'get',
             responseType: 'blob'
-        })
+        });
         // Create a download link and click it programmatically
         const url = window.URL.createObjectURL(new Blob([response as any], { type: 'blob' }));
         const link = document.createElement('a');
@@ -61,16 +60,14 @@ const downloadExcel = async () => {
         // Clean up by revoking the URL object and removing the link
         link?.parentNode?.removeChild(link);
         window.URL.revokeObjectURL(url);
-        store.setLoading(false)
-        toast.add({ severity: 'success', summary: 'Unduhan Selesai', detail: 'Berhasil mengunduh data', life: 3000 })
+        store.setLoading(false);
+        toast.add({ severity: 'success', summary: 'Unduhan Selesai', detail: 'Berhasil mengunduh data', life: 3000 });
     } catch (error: any) {
-        store.setLoading(false)
-        toast.add({ severity: 'error', summary: 'Terjadi Kesahalan', detail: error.message, life: 3000 })
+        store.setLoading(false);
+        toast.add({ severity: 'error', summary: 'Terjadi Kesahalan', detail: error.message, life: 3000 });
     }
-}
-
+};
 </script>
-
 
 <template>
     <div>
@@ -78,9 +75,7 @@ const downloadExcel = async () => {
             <template #title>
                 <div class="flex justify-between items-center" @click="downloadExcel">
                     <span>Detail Aktifitas Pekerja</span>
-                    <Button :loading="store.loading">
-                        Unduh Excel <i class="pi pi-download"></i>
-                    </Button>
+                    <Button :loading="store.loading"> Unduh Excel <i class="pi pi-download"></i> </Button>
                 </div>
             </template>
             <template #subtitle>
@@ -89,8 +84,13 @@ const downloadExcel = async () => {
             <template #content>
                 <div class="my-8">
                     <h6 class="text-[18px] font-bold">Data Aktifitas</h6>
-                    <DataTable :value="memberWorkResult.activities" size="large" :rowHover="true" :lazy="true"
-                        :rowStyle="({ approve, reject }) => approve == true ? { background: '#79bed9', color: 'white' } : reject == true ? { background: '#d98494', color: 'white' } : {}">
+                    <DataTable
+                        :value="memberWorkResult.activities"
+                        size="large"
+                        :rowHover="true"
+                        :lazy="true"
+                        :rowStyle="({ approve, reject }) => (approve == true ? { background: '#79bed9', color: 'white' } : reject == true ? { background: '#d98494', color: 'white' } : {})"
+                    >
                         <Column field="activity.name" header="Aktifitas"></Column>
                         <Column field="plot" header="Petak"></Column>
                         <Column field="wide" header="Luas"></Column>
@@ -118,27 +118,23 @@ const downloadExcel = async () => {
                         </Column>
                     </DataTable>
                 </div>
-
             </template>
             <template #footer>
                 <div class="my-8 flex justify-end">
                     <div>
                         <div class="grid grid-cols-2 my-4 gap-40">
                             <span class="font-semibold text-[14px] text-red-500">Total BON</span>
-                            <span class="font-semibold text-[14px] text-red-500"> {{ formatRupiah(totalBon)
-                                }}</span>
+                            <span class="font-semibold text-[14px] text-red-500"> {{ formatRupiah(totalBon) }}</span>
                         </div>
-                        <hr>
+                        <hr />
                         <div class="grid grid-cols-2 my-4 gap-40">
                             <span class="font-semibold text-[14px] text-blue-500">Sub Total</span>
-                            <span class="font-semibold text-[14px] text-blue-500"> {{ formatRupiah(total)
-                                }}</span>
+                            <span class="font-semibold text-[14px] text-blue-500"> {{ formatRupiah(total) }}</span>
                         </div>
-                        <hr>
+                        <hr />
                         <div class="grid grid-cols-2 my-4 gap-40">
                             <span class="font-semibold text-[14px]">Total Bersih</span>
-                            <span class="font-semibold text-[14px]"> {{ formatRupiah(total - totalBon)
-                                }}</span>
+                            <span class="font-semibold text-[14px]"> {{ formatRupiah(total - totalBon) }}</span>
                         </div>
                     </div>
                 </div>

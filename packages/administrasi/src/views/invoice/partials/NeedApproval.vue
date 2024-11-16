@@ -3,25 +3,25 @@ import doRequest from '@/helpers/do-request.helper';
 import { useToast } from 'primevue/usetoast';
 import { ref } from 'vue';
 
-const dataRef = ref<any[]>([])
-const toast = useToast()
-const loadingTable = ref<boolean>(false)
+const dataRef = ref<any[]>([]);
+const toast = useToast();
+const loadingTable = ref<boolean>(false);
 
 const getData = async () => {
-    loadingTable.value = true
+    loadingTable.value = true;
     try {
         const response = await doRequest({
-            method: "get",
-            url: "invoice/statuses/NEEDAPPROVAL"
-        })
+            method: 'get',
+            url: 'invoice/statuses/NEEDAPPROVAL'
+        });
 
-        const data = response.data
+        const data = response.data;
         dataRef.value = data;
-        loadingTable.value = false
+        loadingTable.value = false;
     } catch (error) {
-        loadingTable.value = false
+        loadingTable.value = false;
     }
-}
+};
 
 const onApprove = async (data: any) => {
     try {
@@ -33,14 +33,14 @@ const onApprove = async (data: any) => {
                 id: data.id,
                 status: 'APPROVE'
             }
-        })
+        });
 
-        getData()
-        toast.add({ severity: 'success', summary: 'Berhasil', detail: 'Berhasil approve data ' + data.bapNumber })
+        getData();
+        toast.add({ severity: 'success', summary: 'Berhasil', detail: 'Berhasil approve data ' + data.bapNumber });
     } catch (error: any) {
-        toast.add({ severity: 'error', summary: 'Terjadi Kesalahan', detail: error.message })
+        toast.add({ severity: 'error', summary: 'Opps!', detail: error.message });
     }
-}
+};
 
 const onReject = async (data: any) => {
     try {
@@ -52,17 +52,17 @@ const onReject = async (data: any) => {
                 id: data.id,
                 status: 'REJECT'
             }
-        })
+        });
 
-        getData()
+        getData();
 
-        toast.add({ severity: 'success', summary: 'Berhasil', detail: 'Berhasil reject data ' + data.bapNumber })
+        toast.add({ severity: 'success', summary: 'Berhasil', detail: 'Berhasil reject data ' + data.bapNumber });
     } catch (error: any) {
-        toast.add({ severity: 'error', summary: 'Terjadi Kesalahan', detail: error.message })
+        toast.add({ severity: 'error', summary: 'Opps!', detail: error.message });
     }
-}
+};
 
-defineExpose({ getData })
+defineExpose({ getData });
 </script>
 
 <template>
@@ -73,7 +73,7 @@ defineExpose({ getData })
             </template>
             <Column field="type" header="Tipe">
                 <template #body="slotProps">
-                    <span>{{ slotProps.data.type == "activity" ? "Aktifitas" : "Tambahan" }}</span>
+                    <span>{{ slotProps.data.type == 'activity' ? 'Aktifitas' : 'Tambahan' }}</span>
                 </template>
             </Column>
             <Column field="Invoice.number" header="Nomor Invoice"></Column>

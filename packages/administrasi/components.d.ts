@@ -35,6 +35,7 @@ declare module 'vue' {
     IconSupport: typeof import('./src/components/icons/IconSupport.vue')['default']
     IconTooling: typeof import('./src/components/icons/IconTooling.vue')['default']
     InputIcon: typeof import('primevue/inputicon')['default']
+    InputMask: typeof import('primevue/inputmask')['default']
     InputText: typeof import('primevue/inputtext')['default']
     Menu: typeof import('primevue/menu')['default']
     MultiSelect: typeof import('primevue/multiselect')['default']
@@ -49,6 +50,7 @@ declare module 'vue' {
     Tabs: typeof import('primevue/tabs')['default']
     TheWelcome: typeof import('./src/components/TheWelcome.vue')['default']
     Toast: typeof import('primevue/toast')['default']
+    ToastComponent: typeof import('./src/components/ToastComponent.vue')['default']
     Toolbar: typeof import('primevue/toolbar')['default']
     WelcomeItem: typeof import('./src/components/WelcomeItem.vue')['default']
   }

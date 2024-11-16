@@ -10,6 +10,7 @@ model Invoice {
     type               InvoiceType?        @default(ACTIVITY)
     status             Boolean             @default(false)
     Accounting         Accounting[]
+    invoiceRetensi     InvoiceRetensi[]
 }
 
 model InvoiceActivity {
@@ -20,6 +21,7 @@ model InvoiceActivity {
     price      Int
     total      Int
     status     InvoiceStatus?          @default(NEEDAPPROVAL)
+    retensi    Boolean                 @default(false)
     createdAt  DateTime                @default(now())
     updatedAt  DateTime                @default(now())
     activityId String
@@ -27,6 +29,17 @@ model InvoiceActivity {
     details    InvoiceActivityDetail[]
     Invoice    Invoice?                @relation(fields: [invoiceId], references: [id])
     invoiceId  String?
+}
+
+model InvoiceRetensi {
+    id        String   @id @default(uuid())
+    note      String
+    type      String   @default("minus")
+    amount    Int
+    Invoice   Invoice? @relation(fields: [invoiceId], references: [id])
+    invoiceId String?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now())
 }
 
 model InvoiceActivityDetail {
@@ -48,6 +61,7 @@ model InvoiceAdditional {
     updatedAt  DateTime      @default(now())
     activityId String
     invoiceId  String
+    rent       Boolean       @default(false)
     invoice    Invoice?      @relation(fields: [invoiceId], references: [id])
     activity   Activity?     @relation(fields: [activityId], references: [id])
 }

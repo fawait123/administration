@@ -5,47 +5,45 @@ import Global from './partials/Global.vue';
 import NeedApproval from './partials/NeedApproval.vue';
 import Reject from './partials/Reject.vue';
 
-const approveRef = ref<InstanceType<typeof Approve> | null>(null)
-const needApprovaRef = ref<InstanceType<typeof NeedApproval> | null>(null)
-const rejectRef = ref<InstanceType<typeof Reject> | null>(null)
-const globalRef = ref<InstanceType<typeof Global> | null>(null)
-
+const approveRef = ref<InstanceType<typeof Approve> | null>(null);
+const needApprovaRef = ref<InstanceType<typeof NeedApproval> | null>(null);
+const rejectRef = ref<InstanceType<typeof Reject> | null>(null);
+const globalRef = ref<InstanceType<typeof Global> | null>(null);
 
 const changeTab = (value: string) => {
     switch (value) {
-        case "need-approval":
+        case 'need-approval':
             if (needApprovaRef.value) {
-                needApprovaRef.value.getData()
+                needApprovaRef.value.getData();
             }
             break;
-        case "approve":
+        case 'approve':
             if (approveRef.value) {
-                approveRef.value.getData()
+                approveRef.value.getData();
             }
             break;
-        case "reject":
+        case 'reject':
             if (rejectRef.value) {
-                rejectRef.value.getData()
+                rejectRef.value.getData();
             }
             break;
-        case "global":
+        case 'global':
             if (globalRef.value) {
-                globalRef.value.tableRef.getData()
+                globalRef.value.tableRef.getData();
             }
             break;
     }
-}
+};
 
 onMounted(() => {
-    if (needApprovaRef.value) {
-        needApprovaRef.value.getData()
+    if (globalRef.value) {
+        globalRef.value.tableRef.getData();
     }
-})
-
+});
 </script>
 
 <template>
-    <Tabs value="0">
+    <Tabs value="3">
         <TabList>
             <Tab value="0" @click="changeTab('need-approval')">Need Approval</Tab>
             <Tab value="1" @click="changeTab('approve')">Approve</Tab>

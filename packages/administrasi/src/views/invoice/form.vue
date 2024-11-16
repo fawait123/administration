@@ -4,27 +4,27 @@ import ActivityForm from './partials/ActivityForm.vue';
 import AdditionalForm from './partials/AdditionalForm.vue';
 import InputText from 'primevue/inputtext';
 
-const tabRef = ref<string>("0")
-const openModal = ref<boolean>(false)
-const totalData = ref<number>(1)
-const activityComponent = ref<InstanceType<typeof ActivityForm> | null>(null)
-const additionalComponent = ref<InstanceType<typeof AdditionalForm> | null>(null)
+const tabRef = ref<string>('0');
+const openModal = ref<boolean>(false);
+const totalData = ref<number>(1);
+const activityComponent = ref<InstanceType<typeof ActivityForm> | null>(null);
+const additionalComponent = ref<InstanceType<typeof AdditionalForm> | null>(null);
 
 const changeTab = (value: any) => {
-    tabRef.value = value
-}
+    tabRef.value = value;
+};
 
 const pressOk = () => {
-    if (activityComponent.value && tabRef.value == "0") {
-        activityComponent.value.generateDataActivity()
+    if (activityComponent.value && tabRef.value == '0') {
+        activityComponent.value.generateDataActivity();
     }
 
-    if (additionalComponent.value && tabRef.value == "1") {
-        additionalComponent.value.generateDataBon()
+    if (additionalComponent.value && tabRef.value == '1') {
+        additionalComponent.value.generateDataBon();
     }
 
     openModal.value = false;
-}
+};
 
 document.addEventListener('keydown', (event) => {
     // Cek apakah tombol Ctrl ditekan
@@ -34,8 +34,7 @@ document.addEventListener('keydown', (event) => {
         // Tambahkan aksi lain di sini
         openModal.value = true;
     }
-})
-
+});
 </script>
 
 <template>

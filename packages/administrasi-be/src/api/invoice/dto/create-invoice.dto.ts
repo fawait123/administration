@@ -1,90 +1,123 @@
-import { Transform, Type } from "class-transformer";
-import { Allow, IsArray, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from "class-validator";
-
+import { Transform, Type } from 'class-transformer';
+import {
+  Allow,
+  IsArray,
+  IsBoolean,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 
 class InvoiceActivityDetail {
-    memberWorkResultId: string;
+  memberWorkResultId: string;
 }
 
 class InvoiceActivity {
-    @IsNotEmpty()
-    @IsString()
-    bapNumber: string;
+  @IsNotEmpty()
+  @IsString()
+  bapNumber: string;
 
-    @IsNotEmpty()
-    @IsString()
-    zone: string;
+  @IsNotEmpty()
+  @IsString()
+  zone: string;
 
-    @IsNotEmpty()
-    @IsNumber()
-    wide: number;
+  @IsNotEmpty()
+  @IsNumber()
+  wide: number;
 
-    @IsNotEmpty()
-    @IsNumber()
-    price: number;
+  @IsNotEmpty()
+  @IsNumber()
+  price: number;
 
-    @IsNotEmpty()
-    @IsNumber()
-    total: number;
+  @IsNotEmpty()
+  @IsNumber()
+  total: number;
 
-    @IsNotEmpty()
-    @IsString()
-    activityId: string;
+  @IsOptional()
+  @IsBoolean()
+  retensi: boolean;
 
-    @ValidateNested({ each: true })
-    @IsArray()
-    @Type(() => InvoiceActivityDetail)
-    details: InvoiceActivityDetail[]
+  @IsNotEmpty()
+  @IsString()
+  activityId: string;
 
-    @IsOptional()
-    id: string | null
+  @ValidateNested({ each: true })
+  @IsArray()
+  @Type(() => InvoiceActivityDetail)
+  details: InvoiceActivityDetail[];
+
+  @IsOptional()
+  id: string | null;
 }
-
 
 class InvoiceAdditionals {
-    @IsNotEmpty()
-    @IsString()
-    activityId: string;
+  @IsNotEmpty()
+  @IsString()
+  activityId: string;
 
-    @IsNotEmpty()
-    @IsString()
-    bapNumber: string;
+  @IsNotEmpty()
+  @IsString()
+  bapNumber: string;
 
-    @IsNotEmpty()
-    @IsNumber()
-    amount: number;
+  @IsNotEmpty()
+  @IsNumber()
+  amount: number;
 
-    @IsOptional()
-    id: string | null
+  @IsOptional()
+  id: string | null;
+
+  @IsOptional()
+  @IsBoolean()
+  rent: boolean;
 }
 
+class InvoiceRetensi {
+  @IsNotEmpty()
+  @IsString()
+  note: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  amount: number;
+
+  @IsOptional()
+  id: string | null;
+}
 
 export class CreateInvoiceDto {
-    @IsNotEmpty()
-    @IsString()
-    number: string
+  @IsNotEmpty()
+  @IsString()
+  number: string;
 
-    @Transform(() => undefined)
-    @Allow()
-    companyId: string;
+  @Transform(() => undefined)
+  @Allow()
+  companyId: string;
 
-    @ValidateNested({ each: true })
-    @IsArray()
-    @Type(() => InvoiceActivity)
-    invoiceActivites: InvoiceActivity[]
+  @ValidateNested({ each: true })
+  @IsArray()
+  @Type(() => InvoiceActivity)
+  invoiceActivites: InvoiceActivity[];
+
+  @IsOptional()
+  @ValidateNested({ each: false })
+  @IsArray()
+  @Type(() => InvoiceRetensi)
+  invoiceRetensi: InvoiceRetensi[];
 }
 
 export class CreateInvoiceAddtionalDto {
-    @IsNotEmpty()
-    @IsString()
-    number: string
+  @IsNotEmpty()
+  @IsString()
+  number: string;
 
-    @Transform(() => undefined)
-    @Allow()
-    companyId: string;
+  @Transform(() => undefined)
+  @Allow()
+  companyId: string;
 
-    @ValidateNested({ each: true })
-    @IsArray()
-    @Type(() => InvoiceAdditionals)
-    invoiceAdditionals: InvoiceAdditionals[]
+  @ValidateNested({ each: true })
+  @IsArray()
+  @Type(() => InvoiceAdditionals)
+  invoiceAdditionals: InvoiceAdditionals[];
 }
