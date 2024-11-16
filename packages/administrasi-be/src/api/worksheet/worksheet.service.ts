@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import * as ExcelJS from 'exceljs';
 import { Response } from 'express';
 import { formatRupiah, getEnv, numberToTextRupiah } from 'libs/helpers';
@@ -1071,6 +1072,89 @@ export class WorksheetService {
       bottom: { style: 'thin' },
       right: { style: 'thin' },
     };
+
+    const buffer = await workbook.xlsx.writeBuffer();
+
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+    res.setHeader('Content-Disposition', 'attachment; filename=example.xlsx');
+
+    res.send(buffer);
+  }
+
+  async exportNotification(res: Response, company: Prisma.CompanyCreateInput) {
+    const notification = await this.prismaService.notification.findMany({
+      where: {
+        companyId: company.id,
+      },
+    });
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Invoice');
+
+    worksheet.getRow(1).values = ['NO', 'Judul', 'Keterangan'];
+    worksheet.getRow(1).eachCell((cell) => {
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: '686D76' }, // Light gray background for headers
+      };
+      cell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' },
+      };
+      cell.font = {
+        size: 12,
+        bold: true,
+        color: {
+          argb: 'FFFFFF',
+        },
+      };
+    });
+
+    worksheet.columns = [
+      {
+        key: 'no',
+        width: 5,
+      },
+      {
+        key: 'title',
+        width: 20,
+      },
+      {
+        key: 'keterangan',
+        width: 150,
+      },
+    ];
+
+    const dataRows = notification.map((item) => {
+      return {
+        keterangan: item.body,
+        title: item.title,
+      };
+    });
+    dataRows.forEach((data, index) => {
+      const row = worksheet.addRow({
+        ...data,
+        no: index + 1,
+        keterangan: data.keterangan
+          .replace(/<\/?span[^>]*>/g, '')
+          .replace(/\s+/g, ' ')
+          .trim(),
+      });
+      row.eachCell((cell) => {
+        cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' },
+        };
+      });
+    });
 
     const buffer = await workbook.xlsx.writeBuffer();
 

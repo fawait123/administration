@@ -1,39 +1,47 @@
 import { Injectable } from '@nestjs/common';
 import { PushNotificationDto } from './dto/push.dto';
 import { Prisma, PrismaClient } from '@prisma/client';
-import { ResponseHelper } from 'libs/helpers/response.helper';
-import * as moment from 'moment';
+import { paginate } from 'libs/helpers/pagination.helper';
+import { StatementScopeHelper } from 'libs/helpers/statement-scope.helper';
+import { PaginationDto } from 'libs/dto/pagination.dto';
 
 @Injectable()
 export class NotificationService {
-    async push(pushNotificationDto: PushNotificationDto) {
-        const prisma = new PrismaClient()
+  async push(pushNotificationDto: PushNotificationDto) {
+    const prisma = new PrismaClient();
 
-        const notification = await prisma.notification.create({
-            data: {
-                title: pushNotificationDto.title,
-                body: pushNotificationDto.body,
-                date: pushNotificationDto.date,
-                companyId: pushNotificationDto.companyId
-            }
-        })
+    const notification = await prisma.notification.create({
+      data: {
+        title: pushNotificationDto.title,
+        body: pushNotificationDto.body,
+        date: pushNotificationDto.date,
+        companyId: pushNotificationDto.companyId,
+      },
+    });
 
-        return notification
-    }
+    return notification;
+  }
 
-    async getCurrentNotification(company: Prisma.CompanyCreateInput) {
-        const prisma = new PrismaClient()
+  async getCurrentNotification(
+    query: PaginationDto,
+    company: Prisma.CompanyCreateInput,
+  ) {
+    const prisma = new PrismaClient();
 
-        const notifications = await prisma.notification.findMany({
-            where: {
-                date: {
-                    gte: moment().startOf('day').toDate(),
-                    lt: moment().endOf('day').toDate()
-                },
-                companyId: company.id
-            }
-        })
-
-        return new ResponseHelper({ data: notifications })
-    }
+    return paginate<Prisma.NotificationFindManyArgs>(
+      prisma.notification,
+      new StatementScopeHelper<Prisma.NotificationFindManyArgs>(
+        { params: query },
+        ['title'],
+      ),
+      {
+        where: {
+          companyId: company.id,
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      },
+    );
+  }
 }

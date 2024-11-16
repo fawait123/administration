@@ -1,6 +1,9 @@
-import { Controller, Get, Param, Res } from '@nestjs/common';
+import { Controller, Get, Param, Res, UseGuards } from '@nestjs/common';
 import { WorksheetService } from './worksheet.service';
 import { Response } from 'express';
+import { CompanyGuard } from 'libs/guard/company-guard/company.guard';
+import { CompanyContext } from 'libs/decorators/company.decorator';
+import { Prisma } from '@prisma/client';
 
 @Controller('worksheet')
 export class WorksheetController {
@@ -19,5 +22,14 @@ export class WorksheetController {
   @Get('invoice-additional/:id')
   invoiceAdditional(@Res() res: Response, @Param('id') id: string) {
     return this.worksheetService.exportInvoiceAdditional(res, id);
+  }
+
+  @UseGuards(CompanyGuard)
+  @Get('notification')
+  notification(
+    @CompanyContext() company: Prisma.CompanyCreateInput,
+    @Res() res: Response,
+  ) {
+    return this.worksheetService.exportNotification(res, company);
   }
 }

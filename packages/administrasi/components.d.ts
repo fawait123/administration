@@ -39,6 +39,7 @@ declare module 'vue' {
     InputText: typeof import('primevue/inputtext')['default']
     Menu: typeof import('primevue/menu')['default']
     MultiSelect: typeof import('primevue/multiselect')['default']
+    Paginator: typeof import('primevue/paginator')['default']
     ProgressSpinner: typeof import('primevue/progressspinner')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

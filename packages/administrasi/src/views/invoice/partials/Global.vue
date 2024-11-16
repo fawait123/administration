@@ -5,9 +5,9 @@ import InvoiceItem from './InvoiceItem.vue';
 import InvoiceType from './InvoiceType.vue';
 import { useRouter } from 'vue-router';
 
-const router = useRouter()
+const router = useRouter();
 
-const tableRef = ref<InstanceType<typeof DataTableComponent> | null>(null)
+const tableRef = ref<InstanceType<typeof DataTableComponent> | null>(null);
 const columns = ref<IColumnTable[]>([
     {
         field: 'id',
@@ -25,21 +25,18 @@ const columns = ref<IColumnTable[]>([
         header: 'Tipe Invoice',
         sortable: false,
         component: markRaw(InvoiceType)
-    },
-])
+    }
+]);
 
 const handleEdit = (data: Record<string, any>) => {
-    router.push({ name: 'invoice-edit', params: { id: data.id } },)
-}
+    router.push({ name: 'invoice-edit', params: { id: data.id } });
+};
 
-
-defineExpose({ tableRef })
+defineExpose({ tableRef });
 </script>
-
 
 <template>
     <div>
-        <DataTableComponent @onEdit="handleEdit" get-url="invoice" ref="tableRef" :columns="columns" :add-button="false"
-            :delete-button="false" />
+        <DataTableComponent @onEdit="handleEdit" get-url="invoice" ref="tableRef" :columns="columns" :add-button="false" :delete-button="false" />
     </div>
 </template>

@@ -6,49 +6,50 @@ import { paginate } from 'libs/helpers/pagination.helper';
 import { StatementScopeHelper } from 'libs/helpers/statement-scope.helper';
 import { ApiTags } from '@nestjs/swagger';
 
-@ApiTags("Employee")
+@ApiTags('Employee')
 @Injectable()
 export class EmployeeService {
-  constructor(
-    private readonly prismaService: PrismaService
-  ) { }
+  constructor(private readonly prismaService: PrismaService) {}
   async create(createActivity: Prisma.EmployeeCreateInput) {
     return await this.prismaService.employee.create({
-      data: createActivity
-    })
+      data: createActivity,
+    });
   }
 
-  async findAll(
-    query: PaginationDto,
-    company: Prisma.CompanyCreateInput
-  ) {
-    return paginate<Prisma.EmployeeFindManyArgs>(this.prismaService.employee, new StatementScopeHelper<Prisma.EmployeeFindManyArgs>({ params: query }, ['name']), {
-      where: {
-        companyId: company.id
-      }
-    })
+  async findAll(query: PaginationDto, company: Prisma.CompanyCreateInput) {
+    return paginate<Prisma.EmployeeFindManyArgs>(
+      this.prismaService.employee,
+      new StatementScopeHelper<Prisma.EmployeeFindManyArgs>({ params: query }, [
+        'name',
+      ]),
+      {
+        where: {
+          companyId: company.id,
+        },
+      },
+    );
   }
 
   async findOne(id: string) {
     const employee = await this.prismaService.employee.findUnique({
       where: {
-        id
-      }
-    })
+        id,
+      },
+    });
 
     if (!employee) {
       throw new BadRequestException('Data pengguna tidak ditemukan');
     }
 
-    return employee
+    return employee;
   }
 
   async update(id: string, updateEmployeeDto: Prisma.EmployeeUpdateInput) {
     const employee = await this.prismaService.employee.findUnique({
       where: {
-        id
-      }
-    })
+        id,
+      },
+    });
 
     if (!employee) {
       throw new BadRequestException('Data pengguna tidak ditemukan');
@@ -56,19 +57,19 @@ export class EmployeeService {
 
     const employeeUpdate = await this.prismaService.employee.update({
       where: {
-        id
+        id,
       },
-      data: updateEmployeeDto
-    })
+      data: updateEmployeeDto,
+    });
     return employeeUpdate;
   }
 
   async remove(id: string) {
     const employee = await this.prismaService.employee.findUnique({
       where: {
-        id
-      }
-    })
+        id,
+      },
+    });
 
     if (!employee) {
       throw new BadRequestException('Data pengguna tidak ditemukan');
@@ -76,9 +77,9 @@ export class EmployeeService {
 
     const deleteEmployee = await this.prismaService.employee.delete({
       where: {
-        id
-      }
-    })
+        id,
+      },
+    });
     return deleteEmployee;
   }
 }
