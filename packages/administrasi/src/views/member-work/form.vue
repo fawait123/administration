@@ -277,7 +277,7 @@ window.addEventListener('keydown', (event) => {
                             @valueChange="(value: any) => handleSelectOption(i, value)"
                             :editable="true"
                             label="Pilih Aktifitas"
-                            :options="availableOptions(i)"
+                            :options="activityData"
                             option-label="name"
                             option-value="id"
                             :error-message="getErros('activities', 'activityId', i)"
