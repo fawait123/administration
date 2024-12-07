@@ -1,13 +1,14 @@
-import { Controller, Get, Param, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Query, Res, UseGuards } from '@nestjs/common';
 import { WorksheetService } from './worksheet.service';
 import { Response } from 'express';
 import { CompanyGuard } from 'libs/guard/company-guard/company.guard';
 import { CompanyContext } from 'libs/decorators/company.decorator';
 import { Prisma } from '@prisma/client';
+import { NotificationFilter } from '../notification/dto/push.dto';
 
 @Controller('worksheet')
 export class WorksheetController {
-  constructor(private readonly worksheetService: WorksheetService) {}
+  constructor(private readonly worksheetService: WorksheetService) { }
 
   @Get('member-work-result/:id')
   memberWorkResult(@Res() res: Response, @Param('id') id: string) {
@@ -29,7 +30,8 @@ export class WorksheetController {
   notification(
     @CompanyContext() company: Prisma.CompanyCreateInput,
     @Res() res: Response,
+    @Query() query: NotificationFilter
   ) {
-    return this.worksheetService.exportNotification(res, company);
+    return this.worksheetService.exportNotification(res, company, query);
   }
 }

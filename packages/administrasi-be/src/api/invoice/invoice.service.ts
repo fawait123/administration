@@ -24,40 +24,40 @@ import { ApproveInvoiceDto } from './dto/approve.dto';
 export class InvoiceService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async validateWorkResult(createInvoiceDto: CreateInvoiceDto) {
-    const data = [];
-    await Promise.all(
-      createInvoiceDto.invoiceActivites.map(async (ia) => {
-        await Promise.all(
-          ia.details.map(async (d) => {
-            const duplicate = await this.prismaService.$queryRaw<
-              {
-                employee: string;
-                activity: string;
-                plot: string;
-              }[]
-            >`SELECT e.name employee, a.name activity, mwa.plot FROM administration.InvoiceActivityDetail ia
-                        left join administration.MemberWorkResultActivity mwa on mwa.id = ia.memberWorkResultActivityId
-                        left join administration.Activity a on a.id = mwa.ActivityId
-                        left join administration.MemberWorkResult mw on mw.id = mwa.memberWorkResultId
-                        left join administration.Employee e on e.id = mw.employeeId
-                        where ia.memberWorkResultActivityId = ${d.memberWorkResultId}`;
-            if (duplicate.length > 0) {
-              data.push(
-                `<b>${duplicate[0].employee} ${duplicate[0].plot} ${duplicate[0].plot}</b>`,
-              );
-            }
-          }),
-        );
-      }),
-    );
-
-    if (data.length > 0) {
-      throw new BadRequestException(
-        `Data hasil kerja anggota ${data.join(`, `)} sudah ditambahkan`,
-      );
-    }
-  }
+  // async validateWorkResult(createInvoiceDto: CreateInvoiceDto) {
+  //   const data = [];
+  //   await Promise.all(
+  //     createInvoiceDto.invoiceActivites.map(async (ia) => {
+  //       await Promise.all(
+  //         ia.details.map(async (d) => {
+  //           const duplicate = await this.prismaService.$queryRaw<
+  //             {
+  //               employee: string;
+  //               activity: string;
+  //               plot: string;
+  //             }[]
+  //           >`SELECT e.name employee, a.name activity, mwa.plot FROM administration.InvoiceActivityDetail ia
+  //                       left join administration.MemberWorkResultActivity mwa on mwa.id = ia.memberWorkResultActivityId
+  //                       left join administration.Activity a on a.id = mwa.ActivityId
+  //                       left join administration.MemberWorkResult mw on mw.id = mwa.memberWorkResultId
+  //                       left join administration.Employee e on e.id = mw.employeeId
+  //                       where ia.memberWorkResultActivityId = ${d.memberWorkResultId}`;
+  //           if (duplicate.length > 0) {
+  //             data.push(
+  //               `<b>${duplicate[0].employee} ${duplicate[0].plot} ${duplicate[0].plot}</b>`,
+  //             );
+  //           }
+  //         }),
+  //       );
+  //     }),
+  //   );
+  //
+  //   if (data.length > 0) {
+  //     throw new BadRequestException(
+  //       `Data hasil kerja anggota ${data.join(`, `)} sudah ditambahkan`,
+  //     );
+  //   }
+  // }
 
   async validateBap(createInvoiceDto: CreateInvoiceDto) {
     const data = [];
@@ -96,7 +96,7 @@ export class InvoiceService {
 
     await this.validateBap(createInvoiceDto);
 
-    await this.validateWorkResult(createInvoiceDto);
+    // await this.validateWorkResult(createInvoiceDto);
 
     const transaction = await this.prismaService.$transaction(async (t) => {
       const invoice = await t.invoice.create({
@@ -113,13 +113,13 @@ export class InvoiceService {
                 zone: item.zone,
                 activityId: item.activityId,
                 retensi: item.retensi,
-                details: {
-                  create: item.details.map((det) => {
-                    return {
-                      memberWorkResultActivityId: det.memberWorkResultId,
-                    };
-                  }),
-                },
+                // details: {
+                //   create: item.details.map((det) => {
+                //     return {
+                //       memberWorkResultActivityId: det.memberWorkResultId,
+                //     };
+                //   }),
+                // },
               };
             }),
           },
@@ -358,13 +358,13 @@ export class InvoiceService {
                 zone: item.zone,
                 activityId: item.activityId,
                 retensi: item.retensi,
-                details: {
-                  create: item.details.map((det) => {
-                    return {
-                      memberWorkResultActivityId: det.memberWorkResultId,
-                    };
-                  }),
-                },
+                // details: {
+                //   create: item.details.map((det) => {
+                //     return {
+                //       memberWorkResultActivityId: det.memberWorkResultId,
+                //     };
+                //   }),
+                // },
               },
               where: {
                 id: item.id,
@@ -381,13 +381,13 @@ export class InvoiceService {
                 zone: item.zone,
                 retensi: item.retensi,
                 activityId: item.activityId,
-                details: {
-                  create: item.details.map((det) => {
-                    return {
-                      memberWorkResultActivityId: det.memberWorkResultId,
-                    };
-                  }),
-                },
+                // details: {
+                //   create: item.details.map((det) => {
+                //     return {
+                //       memberWorkResultActivityId: det.memberWorkResultId,
+                //     };
+                //   }),
+                // },
               },
             });
           }

@@ -43,10 +43,10 @@ class InvoiceActivity {
   @IsString()
   activityId: string;
 
-  @ValidateNested({ each: true })
-  @IsArray()
-  @Type(() => InvoiceActivityDetail)
-  details: InvoiceActivityDetail[];
+  // @ValidateNested({ each: true })
+  // @IsArray()
+  // @Type(() => InvoiceActivityDetail)
+  // details: InvoiceActivityDetail[];
 
   @IsOptional()
   id: string | null;

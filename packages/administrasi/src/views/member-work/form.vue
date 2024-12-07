@@ -272,7 +272,7 @@ window.addEventListener('keydown', (event) => {
             <div class="card relative" v-for="(activity, i) in formRef.activities" :key="i">
                 <div class="grid grid-cols-3 gap-4">
                     <div class="flex flex-col gap-8">
-                        <CustomInputGroup label="Petak" :invalid="!!getErros('activities', 'plot', i)" :name="`plot[${[i]}]`" :error-message="getErros('activities', 'plot', i)" v-model="activity.plot" type="text" placeholder="Petak" class="w-full" />
+                        <CustomInputGroup label="Zona" :invalid="!!getErros('activities', 'plot', i)" :name="`plot[${[i]}]`" :error-message="getErros('activities', 'plot', i)" v-model="activity.plot" type="text" placeholder="Zona" class="w-full" />
                         <CustomSelectGroup
                             @valueChange="(value: any) => handleSelectOption(i, value)"
                             :editable="true"

@@ -21,7 +21,15 @@ export class CompanyService {
   async findAll(
     query: PaginationDto
   ) {
-    return paginate(this.prismaService.company, new StatementScopeHelper<Prisma.CompanyFindFirstArgs>({ params: query }, ['name', 'address']))
+    if (!query.where) {
+      query.where = {}
+    }
+
+    return paginate(this.prismaService.company, new StatementScopeHelper<Prisma.CompanyFindFirstArgs>({ params: query }, ['name', 'address']), {
+      where: {
+        ...query.where
+      }
+    })
   }
 
   async findOne(id: string) {

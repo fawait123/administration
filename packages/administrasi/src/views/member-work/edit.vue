@@ -365,9 +365,9 @@ const handleDeleteActivity = async () => {
                 <div class="card relative" v-for="(activity, i) in formRef.activities" :key="i">
                     <div class="grid grid-cols-3 gap-4">
                         <div class="flex flex-col gap-8">
-                            <CustomInputGroup label="Petak" :invalid="!!getErros('activities', 'plot', i)"
+                            <CustomInputGroup label="Zona" :invalid="!!getErros('activities', 'plot', i)"
                                 :name="`plot[${[i]}]`" :error-message="getErros('activities', 'plot', i)"
-                                v-model="activity.plot" type="text" placeholder="Petak" class="w-full" />
+                                v-model="activity.plot" type="text" placeholder="Zona" class="w-full" />
                             <CustomSelectGroup @valueChange="(value: any) => handleSelectOption(i, value)"
                                 :editable="true" label="Pilih Aktifitas" :options="activityData" option-label="name"
                                 option-value="id" :error-message="getErros('activities', 'activityId', i)"

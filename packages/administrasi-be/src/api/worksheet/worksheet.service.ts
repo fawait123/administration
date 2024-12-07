@@ -5,10 +5,11 @@ import { Response } from 'express';
 import { formatRupiah, getEnv, numberToTextRupiah } from 'libs/helpers';
 import * as moment from 'moment';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { NotificationFilter } from '../notification/dto/push.dto';
 
 @Injectable()
 export class WorksheetService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService) { }
 
   async getMemberWorkResult(id: string) {
     const exist = await this.prismaService.memberWorkResult.findFirst({
@@ -571,7 +572,7 @@ export class WorksheetService {
           (prev, next) => prev + next.total,
           0,
         )) /
-        100,
+      100,
     );
     worksheet.getCell(`G${totalCell + 2}`).font = {
       bold: true,
@@ -596,13 +597,13 @@ export class WorksheetService {
     };
     worksheet.getCell(`G${totalCell + 3}`).value = formatRupiah(
       invoice.invoiceActivities.reduce((prev, next) => prev + next.total, 0) -
-        (+getEnv('tax.env', 'TAX_AMOUNT') *
-          invoice.invoiceActivities.reduce(
-            (prev, next) => prev + next.total,
-            0,
-          )) /
-          100 -
-        invoice.invoiceRetensi.reduce((prev, next) => prev + next.amount, 0),
+      (+getEnv('tax.env', 'TAX_AMOUNT') *
+        invoice.invoiceActivities.reduce(
+          (prev, next) => prev + next.total,
+          0,
+        )) /
+      100 -
+      invoice.invoiceRetensi.reduce((prev, next) => prev + next.amount, 0),
     );
     worksheet.getCell(`G${totalCell + 3}`).font = {
       bold: true,
@@ -928,7 +929,7 @@ export class WorksheetService {
           (prev, next) => prev + next.amount,
           0,
         )) /
-        100,
+      100,
     );
     worksheet.getCell(`D${totalCell + 2}`).font = {
       bold: true,
@@ -954,12 +955,12 @@ export class WorksheetService {
     worksheet.mergeCells(`D${totalCell + 3}:G${totalCell + 3}`);
     worksheet.getCell(`D${totalCell + 3}`).value = formatRupiah(
       invoice.invoiceAdditionals.reduce((prev, next) => prev + next.amount, 0) -
-        (+getEnv('tax.env', 'TAX_AMOUNT') *
-          invoice.invoiceAdditionals.reduce(
-            (prev, next) => prev + next.amount,
-            0,
-          )) /
-          100,
+      (+getEnv('tax.env', 'TAX_AMOUNT') *
+        invoice.invoiceAdditionals.reduce(
+          (prev, next) => prev + next.amount,
+          0,
+        )) /
+      100,
     );
     worksheet.getCell(`D${totalCell + 3}`).font = {
       bold: true,
@@ -1084,17 +1085,22 @@ export class WorksheetService {
     res.send(buffer);
   }
 
-  async exportNotification(res: Response, company: Prisma.CompanyCreateInput) {
+  async exportNotification(res: Response, company: Prisma.CompanyCreateInput, query: NotificationFilter) {
+    if (!query.where) {
+      query.where = {};
+    }
+
     const notification = await this.prismaService.notification.findMany({
       where: {
         companyId: company.id,
+        ...query.where
       },
     });
 
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Invoice');
 
-    worksheet.getRow(1).values = ['NO', 'Judul', 'Keterangan'];
+    worksheet.getRow(1).values = ['NO', 'Judul', 'Keterangan', 'Aktifitas'];
     worksheet.getRow(1).eachCell((cell) => {
       cell.fill = {
         type: 'pattern',
@@ -1129,12 +1135,18 @@ export class WorksheetService {
         key: 'keterangan',
         width: 150,
       },
+      {
+        key: 'activity',
+        width: 20,
+      },
     ];
 
     const dataRows = notification.map((item) => {
+      const [plot, activityName] = (item.additional as string).split('|');
       return {
         keterangan: item.body,
         title: item.title,
+        activity: item.title !== "Pembayaran Invoice" ? activityName : item.additional
       };
     });
     dataRows.forEach((data, index) => {

@@ -24,5 +24,5 @@ export class PaginationDto {
     order: object
 
     @Allow()
-    where: any
+    where: Record<string, any> = {}
 }

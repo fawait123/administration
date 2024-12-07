@@ -1,5 +1,6 @@
 import doRequest from '@/helpers/do-request.helper'
 import { defineStore } from 'pinia'
+import { useProfileStore } from './profile.store'
 
 // You can name the return value of `defineStore()` anything you want,
 // but it's best to use the name of the store and surround it with `use`
@@ -26,12 +27,25 @@ export const useCompanyStore = defineStore('company', {
     actions: {
         async getData() {
             this.loading = true;
+            const profileStore = useProfileStore()
+            await profileStore.getData()
+
+            const where = {
+                id: {}
+            }
+
+            if (profileStore.data.role.name !== "Administrator") {
+                where.id = {
+                    in: profileStore.data.role.companies.map((item) => item.companyId)
+                }
+            }
             const companyData = await doRequest({
                 method: "get",
                 url: "/company",
                 params: {
                     page: 1,
-                    limit: 1000
+                    limit: 1000,
+                    where: where
                 }
             });
             this.loading = false;

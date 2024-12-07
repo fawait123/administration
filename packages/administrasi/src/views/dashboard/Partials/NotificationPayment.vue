@@ -23,7 +23,7 @@ const getCurrentNotification = async () => {
                 page: paginationRef.value.page,
                 limit: 10,
                 where: {
-                    title: 'Pembayaran Invoice'
+                    title: 'Pemberitahuan Pembayaran'
                 }
             }
         });
@@ -53,7 +53,7 @@ const downloadExcel = async () => {
                 page: paginationRef.value.page,
                 limit: 10,
                 where: {
-                    title: 'Pembayaran Invoice'
+                    title: 'Pemberitahuan Pembayaran'
                 }
             }
         });

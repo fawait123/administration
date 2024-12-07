@@ -2,13 +2,13 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { apiReference } from '@scalar/nestjs-api-reference'
+import { apiReference } from '@scalar/nestjs-api-reference';
 import { ConfigService } from '@nestjs/config';
 import { HttpExeptionFilter } from 'libs/filters/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
-  app.useGlobalPipes(new ValidationPipe())
+  app.useGlobalPipes(new ValidationPipe());
 
   const config = new DocumentBuilder()
     .setTitle('Nest JS')
@@ -27,7 +27,12 @@ async function bootstrap() {
   )
   const configService = new ConfigService()
   const port = configService.get('PORT') || 3000;
-  app.useGlobalFilters(new HttpExeptionFilter());
+  // app.useGlobalFilters(new HttpExeptionFilter());
+
+  (BigInt.prototype as any).toJSON = function () {
+    const int = Number.parseInt(this.toString());
+    return int ?? this.toString();
+  };
   await app.listen(port);
 }
 bootstrap();

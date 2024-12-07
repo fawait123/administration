@@ -84,15 +84,10 @@ const downloadExcel = async () => {
             <template #content>
                 <div class="my-8">
                     <h6 class="text-[18px] font-bold">Data Aktifitas</h6>
-                    <DataTable
-                        :value="memberWorkResult.activities"
-                        size="large"
-                        :rowHover="true"
-                        :lazy="true"
-                        :rowStyle="({ approve, reject }) => (approve == true ? { background: '#79bed9', color: 'white' } : reject == true ? { background: '#d98494', color: 'white' } : {})"
-                    >
+                    <DataTable :value="memberWorkResult.activities" size="large" :rowHover="true" :lazy="true"
+                        :rowStyle="({ approve, reject }) => (approve ? { background: '#79bed9', color: 'white' } : reject ? { background: '#d98494', color: 'white' } : {})">
+                        <Column field="plot" header="Zona"></Column>
                         <Column field="activity.name" header="Aktifitas"></Column>
-                        <Column field="plot" header="Petak"></Column>
                         <Column field="wide" header="Luas"></Column>
                         <Column field="ql" header="QL"></Column>
                         <Column field="price" header="Harga">
@@ -105,6 +100,9 @@ const downloadExcel = async () => {
                                 <span>{{ formatRupiah(slotProps.data.subTotal) }}</span>
                             </template>
                         </Column>
+                        <template #empty>
+                            <span class="font-bold text-center">Tidak ada data Aktifitas Pekerja</span>
+                        </template>
                     </DataTable>
                 </div>
                 <div class="my-8">
@@ -116,6 +114,9 @@ const downloadExcel = async () => {
                                 <span>{{ formatRupiah(slotProps.data.total) }}</span>
                             </template>
                         </Column>
+                        <template #empty>
+                            <span class="font-bold text-center">Tidak ada data BON</span>
+                        </template>
                     </DataTable>
                 </div>
             </template>

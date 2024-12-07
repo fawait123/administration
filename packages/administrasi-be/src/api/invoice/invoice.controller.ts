@@ -1,7 +1,23 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { InvoiceService } from './invoice.service';
-import { CreateInvoiceAddtionalDto, CreateInvoiceDto } from './dto/create-invoice.dto';
-import { UpdateInvoiceAdditonalDto, UpdateInvoiceDto } from './dto/update-invoice.dto';
+import {
+  CreateInvoiceAddtionalDto,
+  CreateInvoiceDto,
+} from './dto/create-invoice.dto';
+import {
+  UpdateInvoiceAdditonalDto,
+  UpdateInvoiceDto,
+} from './dto/update-invoice.dto';
 import { InvoiceStatus, Prisma } from '@prisma/client';
 import { PaginationDto } from 'libs/dto/pagination.dto';
 import { CompanyContext } from 'libs/decorators/company.decorator';
@@ -9,7 +25,7 @@ import { CompanyGuard } from 'libs/guard/company-guard/company.guard';
 import { ApiTags } from '@nestjs/swagger';
 import { ApproveInvoiceDto } from './dto/approve.dto';
 
-@ApiTags("Invoice")
+@ApiTags('Invoice')
 @UseGuards(CompanyGuard)
 @Controller('invoice')
 export class InvoiceController {
@@ -40,13 +56,13 @@ export class InvoiceController {
 
   @Get('all')
   getAllInvoice(@CompanyContext() company: Prisma.CompanyCreateInput) {
-    return this.invoiceService.getAllInvoice(company)
+    return this.invoiceService.getAllInvoice(company);
   }
 
 
   @Post('adjusment')
   approve(@Body() approveDto: ApproveInvoiceDto) {
-    return this.invoiceService.approve(approveDto)
+    return this.invoiceService.approve(approveDto);
   }
 
   @Get('/statuses/:status')
@@ -76,11 +92,11 @@ export class InvoiceController {
 
   @Delete('activities/:id')
   deleteActivities(@Param('id') id: string) {
-    return this.invoiceService.deleteActivity(id)
+    return this.invoiceService.deleteActivity(id);
   }
 
   @Delete('additional/:id')
   deleteAdditional(@Param('id') id: string) {
-    return this.invoiceService.deleteAdditional(id)
+    return this.invoiceService.deleteAdditional(id);
   }
 }

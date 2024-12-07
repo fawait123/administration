@@ -10,7 +10,7 @@ import { StatementScopeHelper } from 'libs/helpers/statement-scope.helper';
 
 @Injectable()
 export class MemberWorkResultService {
-  constructor(private readonly primaService: PrismaService) {}
+  constructor(private readonly primaService: PrismaService) { }
 
   async validateActivity(createMemberWorkResultDto: CreateMemberWorkResultDto) {
     const data: string[] = [];
@@ -169,14 +169,29 @@ export class MemberWorkResultService {
 
     const activities = await Promise.all(
       memberWorkResult.activities.map(async (item) => {
-        const approve: Record<string, any>[] = await this.primaService
-          .$queryRaw`select ia.status status from InvoiceActivityDetail ad left join InvoiceActivity ia on ad.invoiceActivityId = ia.id where ad.memberWorkResultActivityId = ${item.id} and ia.status = 'APPROVE'`;
-        const reject: Record<string, any>[] = await this.primaService
-          .$queryRaw`select ia.status status from InvoiceActivityDetail ad left join InvoiceActivity ia on ad.invoiceActivityId = ia.id where ad.memberWorkResultActivityId = ${item.id} and ia.status = 'REJECT'`;
+        const approve: { total: BigInt }[] = await this.primaService.$queryRaw<
+          { total: BigInt }[]
+        >`
+          SELECT COUNT(*) AS total
+          FROM InvoiceActivity ia
+          WHERE ia.zone = ${item.plot}
+            AND ia.activityId = ${item.ActivityId}
+            AND ia.status = 'APPROVE'
+        `;
+
+        const reject: { total: BigInt }[] = await this.primaService.$queryRaw<
+          { total: BigInt }[]
+        >`
+          SELECT COUNT(*) AS total
+          FROM InvoiceActivity ia
+          WHERE ia.zone = ${item.plot}
+            AND ia.activityId = ${item.ActivityId}
+            AND ia.status = 'REJECT'
+        `;
         return {
           ...item,
-          approve: approve.length > 0 ? true : false,
-          reject: reject.length > 0 ? true : false,
+          approve: approve.reduce((prev, next) => prev + Number(next.total), 0) > 0,
+          reject: reject.reduce((prev, next) => prev + Number(next.total), 0) > 0,
         };
       }),
     );

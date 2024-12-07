@@ -16,8 +16,8 @@ import { InputNumber } from 'primevue';
 import ToastComponent from '../../../components/ToastComponent.vue';
 
 const props = defineProps<{
-    totalData: number;
-    edit: boolean;
+    totalData: number,
+    edit: boolean
 }>();
 
 const emmit = defineEmits();
@@ -58,10 +58,7 @@ const getActivity = async () => {
         method: 'get',
         params: {
             page: 1, // Calculate page number
-            limit: 100,
-            where: {
-                type: 'COMPANY'
-            }
+            limit: 100000,
         }
     });
 
@@ -104,7 +101,7 @@ const formRef = ref<{
         wide: string;
         price: string;
         total: string;
-        details: [];
+        // details: [];
         id: string | null;
         retensi: boolean;
     }[];
@@ -123,7 +120,7 @@ const formRef = ref<{
             wide: '0',
             price: '0',
             total: '0',
-            details: [],
+            // details: [],
             id: null,
             retensi: false
         }
@@ -149,7 +146,7 @@ const addActivity = () => {
         wide: '0',
         price: '0',
         total: '0',
-        details: [],
+        // details: [],
         id: null,
         retensi: false
     });
@@ -220,11 +217,11 @@ const handleSubmit = async () => {
                             total: +item.total,
                             activityId: item.activityId,
                             retensi: item.retensi,
-                            details: item.details.map((det) => {
-                                return {
-                                    memberWorkResultId: det
-                                };
-                            }),
+                            // details: item.details.map((det) => {
+                            //     return {
+                            //         memberWorkResultId: det
+                            //     };
+                            // }),
                             id: item.id
                         };
                     }),
@@ -252,7 +249,7 @@ const handleSubmit = async () => {
 
 const calculateprice = (event: any, i: number) => {
     if (formRef.value.invoiceActivites[i].retensi) {
-        formRef.value.invoiceActivites[i].total = Math.round((event * +formRef.value.invoiceActivites[i].wide * 10) / 100).toString();
+        formRef.value.invoiceActivites[i].total = Math.round((event * +formRef.value.invoiceActivites[i].wide * 90) / 100).toString();
     } else {
         formRef.value.invoiceActivites[i].total = (event * +formRef.value.invoiceActivites[i].wide).toString();
     }
@@ -260,7 +257,7 @@ const calculateprice = (event: any, i: number) => {
 
 const calculateWide = (event: any, i: number) => {
     if (formRef.value.invoiceActivites[i].retensi) {
-        formRef.value.invoiceActivites[i].total = Math.round((event * +formRef.value.invoiceActivites[i].price * 10) / 100).toString();
+        formRef.value.invoiceActivites[i].total = Math.round((event * +formRef.value.invoiceActivites[i].price * 90) / 100).toString();
     } else {
         formRef.value.invoiceActivites[i].total = (event * +formRef.value.invoiceActivites[i].price).toString();
     }
@@ -268,7 +265,7 @@ const calculateWide = (event: any, i: number) => {
 
 const handleRetensi = (value: boolean, activity: Record<string, any>, i: number) => {
     if (value) {
-        formRef.value.invoiceActivites[i].total = Math.round((+activity.price * +activity.wide * 10) / 100).toString();
+        formRef.value.invoiceActivites[i].total = Math.round((+activity.price * +activity.wide * 90) / 100).toString();
     } else {
         formRef.value.invoiceActivites[i].total = (+activity.price * +activity.wide).toString();
     }
@@ -327,19 +324,16 @@ defineExpose({ generateDataActivity, formRef, selectedOptions, dataTobeDeleted, 
                             placeholder="Nomor BAP"
                             class="w-full"
                         />
-                        <CustomSelectGroup
-                            @valueChange="(value: any) => handleSelectOption(i, value)"
-                            :editable="true"
-                            label="Pilih Aktifitas"
-                            :options="availableOptions(i)"
-                            option-label="name"
-                            option-value="id"
-                            :error-message="getErros('invoiceActivites', 'activityId', i)"
-                            :name="`activity[${[i]}]`"
-                            :invalid="!!getErros('invoiceActivites', 'activityId', i)"
-                            v-model="activity.activityId"
-                            type="text"
-                            placeholder="Kegiatan"
+
+                        <CustomInputGroup
+                            label="Luas"
+                            :error-message="getErros('invoiceActivites', 'wide', i)"
+                            @input="calculateWide(activity.wide, i)"
+                            :name="`wide[${[i]}]`"
+                            :invalid="!!getErros('invoiceActivites', 'wide', i)"
+                            v-model="activity.wide"
+                            type="number"
+                            placeholder="Luas"
                             class="w-full"
                         />
                     </div>
@@ -356,34 +350,6 @@ defineExpose({ generateDataActivity, formRef, selectedOptions, dataTobeDeleted, 
                         />
 
                         <CustomInputGroup
-                            label="Luas"
-                            :error-message="getErros('invoiceActivites', 'wide', i)"
-                            @input="calculateWide(activity.wide, i)"
-                            :name="`wide[${[i]}]`"
-                            :invalid="!!getErros('invoiceActivites', 'wide', i)"
-                            v-model="activity.wide"
-                            type="number"
-                            placeholder="Luas"
-                            class="w-full"
-                        />
-                    </div>
-                    <div class="flex flex-col gap-8">
-                        <CustomMultiSelectGroup
-                            :editable="true"
-                            label="Pilih Hasil kerja Anggota"
-                            @handleChange="handleChangeMemberWork(activity.details, i)"
-                            :options="memberWorkResultData"
-                            option-label="label"
-                            option-value="value"
-                            :error-message="getErros('invoiceActivites', 'details', i)"
-                            :name="`activity[${[i]}]`"
-                            :invalid="!!getErros('invoiceActivites', 'details', i)"
-                            v-model="activity.details"
-                            type="text"
-                            placeholder="Hasil Kerja Anggota"
-                            class="w-full"
-                        />
-                        <CustomInputGroup
                             label="Harga"
                             :error-message="getErros('invoiceActivites', 'price', i)"
                             @input="calculateprice(activity.price, i)"
@@ -395,11 +361,45 @@ defineExpose({ generateDataActivity, formRef, selectedOptions, dataTobeDeleted, 
                             class="w-full"
                         />
                     </div>
-                    <div class="flex gap-8">
+                    <div class="flex flex-col gap-8">
+<!--                        <CustomMultiSelectGroup-->
+<!--                            :editable="true"-->
+<!--                            label="Pilih Hasil kerja Anggota"-->
+<!--                            @handleChange="handleChangeMemberWork(activity.details, i)"-->
+<!--                            :options="memberWorkResultData"-->
+<!--                            option-label="label"-->
+<!--                            option-value="value"-->
+<!--                            :error-message="getErros('invoiceActivites', 'details', i)"-->
+<!--                            :name="`activity[${[i]}]`"-->
+<!--                            :invalid="!!getErros('invoiceActivites', 'details', i)"-->
+<!--                            v-model="activity.details"-->
+<!--                            type="text"-->
+<!--                            placeholder="Hasil Kerja Anggota"-->
+<!--                            class="w-full"-->
+<!--                        />-->
+                        <CustomSelectGroup
+                            @valueChange="(value: any) => handleSelectOption(i, value)"
+                            :editable="true"
+                            label="Pilih Aktifitas"
+                            :options="availableOptions(i)"
+                            option-label="name"
+                            option-value="id"
+                            :error-message="getErros('invoiceActivites', 'activityId', i)"
+                            :name="`activity[${[i]}]`"
+                            :invalid="!!getErros('invoiceActivites', 'activityId', i)"
+                            v-model="activity.activityId"
+                            type="text"
+                            placeholder="Kegiatan"
+                            class="w-full"
+                        />
+
                         <div class="flex-auto">
-                            <label for="ssn" class="font-bold block mb-2">Jumlah</label>
+                            <label for="ssn" class="font-bold block">Jumlah</label>
                             <InputNumber id="ssn" v-model="activity.total" mode="currency" currency="IDR" readonly placeholder="999-99-9999" fluid />
                         </div>
+                    </div>
+                    <div class="flex gap-8">
+
                         <div class="flex items-center gap-2">
                             <Checkbox binary :inputId="`retensi${i}`" @value-change="(value: boolean) => handleRetensi(value, activity, i)" v-model="activity.retensi" />
                             <label :for="`retensi${i}`">Retensi</label>

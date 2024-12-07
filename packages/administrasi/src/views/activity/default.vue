@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import DataTableComponent, { type IColumnTable } from '@/composable/DataTableComponent.vue';
+import DataTableComponent from '@/composable/DataTableComponent.vue';
 import useValidation from '@/helpers/validation.helper';
 import { activitySchema } from '@/schema/index';
 import CustomInputGroup from '@/components/input/CustomInputGroup.vue';
 import { onMounted, ref } from 'vue';
 import doRequest from '@/helpers/do-request.helper';
 import { useToast } from 'primevue/usetoast';
+import type { IColumnTable } from "@/interfaces";
 
 const modalRef = ref<boolean>(false)
 const dataId = ref<string | null>(null)
@@ -22,11 +23,17 @@ const columns = ref<IColumnTable[]>([
         header: 'Nama Aktifitas',
         sortable: false
     },
+    {
+        field: 'description',
+        header: 'Deskripsi',
+        sortable: false
+    },
 ])
 
 const activityRef = ref({
     name: '',
-    type: 'DEFAULT'
+    type: 'DEFAULT',
+    description: ''
 })
 
 const { validate, isValid, getError, scrolltoError } = useValidation(activitySchema, activityRef, {
@@ -42,7 +49,8 @@ const onEdit = (value: any) => {
     dataId.value = value.id
     activityRef.value = {
         name: value.name,
-        type: 'DEFAULT'
+        type: 'DEFAULT',
+        description: value.description
     }
 
     modalRef.value = true;
@@ -52,7 +60,8 @@ const onEdit = (value: any) => {
 const resetForm = () => {
     activityRef.value = {
         name: '',
-        type: 'DEFAULT'
+        type: 'DEFAULT',
+        description: ''
     }
     dataId.value = null
 }
@@ -97,6 +106,10 @@ onMounted(() => {
             <div class="flex flex-col gap-6">
                 <CustomInputGroup placeholder="Masukan Aktifitas" label="Aktifitas" v-model="activityRef.name"
                     :invalid="!!getError('name')" :error-message="getError('name')" class-name="mb-8" />
+            </div>
+            <div class="flex flex-col gap-6">
+                <CustomInputGroup placeholder="Masukan Deskripsi" label="Deskripsi" v-model="activityRef.description"
+                    :invalid="!!getError('description')" :error-message="getError('description')" class-name="mb-8" />
             </div>
 
             <template #footer>

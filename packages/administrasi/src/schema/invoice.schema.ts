@@ -9,7 +9,7 @@ export const invoiceSchema = zod.object({
         wide: zod.string().min(1),
         price: zod.string().min(1),
         total: zod.string().min(1),
-        details: zod.array(zod.string()).min(1)
+        // details: zod.array(zod.string()).min(1)
     }))
 })
 

@@ -4,15 +4,8 @@ import { useToast } from 'primevue/usetoast';
 import { onMounted, ref, type Component } from 'vue';
 import doRequest from '@/helpers/do-request.helper';
 import { ResponseMessage } from '@/helpers';
-import type { IPagination } from '@/interfaces/index';
+import type {IColumnTable, IPagination} from '@/interfaces/index';
 import type { DataTablePageEvent } from 'primevue/datatable';
-
-export interface IColumnTable {
-    field: string;
-    header: string;
-    sortable?: boolean;
-    component?: Component;
-}
 
 const props = withDefaults(
     defineProps<{

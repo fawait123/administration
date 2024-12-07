@@ -51,6 +51,7 @@ const toggle = (event: any) => {
 const logout = () => {
     window.localStorage.removeItem('token')
     window.localStorage.removeItem('user')
+    window.localStorage.removeItem('company')
     window.location.href = '/login'
 }
 

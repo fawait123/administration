@@ -18,7 +18,7 @@ export const useProfileStore = defineStore('profile', {
             email: string,
             role: {
                 access: string[],
-                companies: string,
+                companies: Record<string, any>[],
                 name: string
             }
         },
