@@ -10,46 +10,46 @@ import { Request } from 'express';
 export class AuthService {
   constructor(
     private readonly prismaService: PrismaService,
-    private readonly jwtService: JwtService
-  ) { }
+    private readonly jwtService: JwtService,
+  ) {}
 
   async login(authDto: AuthDto) {
     const user = await this.prismaService.user.findFirst({
       where: {
         OR: [
           {
-            username: authDto.username
+            username: authDto.username,
           },
           {
-            email: authDto.password
-          }
-        ]
-      }
-    })
+            email: authDto.password,
+          },
+        ],
+      },
+    });
 
     if (!user) {
-      throw new BadRequestException("User tidak ditemukan")
+      throw new BadRequestException('User tidak ditemukan');
     }
 
     if (!compare(authDto.password, user.password)) {
-      throw new BadRequestException("User tidak ditemukan")
+      throw new BadRequestException('User tidak ditemukan');
     }
 
     const token = await this.jwtService.signAsync({
       id: user.id,
       username: user.username,
-      email: user.email
-    })
-    delete user.password
+      email: user.email,
+    });
+    delete user.password;
     return new ResponseHelper({
       data: {
         user,
-        token: token
-      }
-    })
+        token: token,
+      },
+    });
   }
 
   async profile(req: Request & { user: Record<string, any> }) {
-    return new ResponseHelper({ data: req.user })
+    return new ResponseHelper({ data: req.user });
   }
 }

@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
 import { AccountingService } from './accounting.service';
 import { CreateAccountingDto } from './dto/create-accounting.dto';
 import { UpdateAccountingDto } from './dto/update-accounting.dto';
@@ -10,18 +20,21 @@ import { PaginationDto } from 'libs/dto/pagination.dto';
 @UseGuards(CompanyGuard)
 @Controller('accounting')
 export class AccountingController {
-  constructor(private readonly accountingService: AccountingService) { }
+  constructor(private readonly accountingService: AccountingService) {}
 
   @Post()
-  create(@Body() createAccountingDto: CreateAccountingDto, @CompanyContext() company: Prisma.CompanyCreateInput) {
-    createAccountingDto.companyId = company.id
+  create(
+    @Body() createAccountingDto: CreateAccountingDto,
+    @CompanyContext() company: Prisma.CompanyCreateInput,
+  ) {
+    createAccountingDto.companyId = company.id;
     return this.accountingService.create(createAccountingDto);
   }
 
   @Get()
   findAll(
     @Query() query: PaginationDto,
-    @CompanyContext() company: Prisma.CompanyCreateInput
+    @CompanyContext() company: Prisma.CompanyCreateInput,
   ) {
     return this.accountingService.findAll(query, company);
   }
@@ -32,7 +45,10 @@ export class AccountingController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAccountingDto: UpdateAccountingDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateAccountingDto: UpdateAccountingDto,
+  ) {
     return this.accountingService.update(+id, updateAccountingDto);
   }
 

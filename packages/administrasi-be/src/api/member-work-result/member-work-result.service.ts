@@ -45,6 +45,8 @@ export class MemberWorkResultService {
       );
     }
 
+    await this.validateActivity(createMemberWorkResultDto)
+
     const check = await this.primaService.memberWorkResult.findFirst({
       where: {
         employeeId: createMemberWorkResultDto.employeeId,
@@ -141,11 +143,6 @@ export class MemberWorkResultService {
           },
           activity: true,
         },
-        // where: {
-        //   id: {
-        //     notIn: (await this.primaService.$queryRaw<(Record<string, any>)[]>`select memberWorkResultActivityId from InvoiceActivityDetail`).map((item) => item.memberWorkResultActivityId)
-        //   }
-        // }
       });
 
     return new ResponseHelper({ data: activities });
@@ -169,29 +166,33 @@ export class MemberWorkResultService {
 
     const activities = await Promise.all(
       memberWorkResult.activities.map(async (item) => {
-        const approve: { total: BigInt }[] = await this.primaService.$queryRaw<
-          { total: BigInt }[]
+        const approve: { total: bigint }[] = await this.primaService.$queryRaw<
+          { total: bigint }[]
         >`
-          SELECT COUNT(*) AS total
-          FROM InvoiceActivity ia
-          WHERE ia.zone = ${item.plot}
-            AND ia.activityId = ${item.ActivityId}
-            AND ia.status = 'APPROVE'
+          select count(*) total from (select ia.status, ag.childId activityId, ia.zone from InvoiceActivity ia
+          left join ActivityGroup ag on ag.parentId = ia.activityId 
+          where ia.status = 'APPROVE'
+          UNION ALL 
+          select ia.status, ia.activityId activityId, ia.zone from InvoiceActivity ia
+          where ia.status = 'APPROVE') t where t.zone = ${item.plot} and t.activityId = ${item.ActivityId}
         `;
 
-        const reject: { total: BigInt }[] = await this.primaService.$queryRaw<
-          { total: BigInt }[]
+        const reject: { total: bigint }[] = await this.primaService.$queryRaw<
+          { total: bigint }[]
         >`
-          SELECT COUNT(*) AS total
-          FROM InvoiceActivity ia
-          WHERE ia.zone = ${item.plot}
-            AND ia.activityId = ${item.ActivityId}
-            AND ia.status = 'REJECT'
+          select count(*) total from (select ia.status, ag.childId activityId, ia.zone from InvoiceActivity ia
+          left join ActivityGroup ag on ag.parentId = ia.activityId 
+          where ia.status = 'REJECT'
+          UNION ALL 
+          select ia.status, ia.activityId activityId, ia.zone from InvoiceActivity ia
+          where ia.status = 'REJECT') t where t.zone = ${item.plot} and t.activityId = ${item.ActivityId}
         `;
         return {
           ...item,
-          approve: approve.reduce((prev, next) => prev + Number(next.total), 0) > 0,
-          reject: reject.reduce((prev, next) => prev + Number(next.total), 0) > 0,
+          approve:
+            approve.reduce((prev, next) => prev + Number(next.total), 0) > 0,
+          reject:
+            reject.reduce((prev, next) => prev + Number(next.total), 0) > 0,
         };
       }),
     );

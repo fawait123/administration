@@ -6,6 +6,6 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 @Module({
   controllers: [ActivityController],
   providers: [ActivityService],
-  imports: [PrismaModule]
+  imports: [PrismaModule],
 })
-export class ActivityModule { }
+export class ActivityModule {}

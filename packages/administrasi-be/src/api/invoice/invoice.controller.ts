@@ -29,16 +29,22 @@ import { ApproveInvoiceDto } from './dto/approve.dto';
 @UseGuards(CompanyGuard)
 @Controller('invoice')
 export class InvoiceController {
-  constructor(private readonly invoiceService: InvoiceService) { }
+  constructor(private readonly invoiceService: InvoiceService) {}
 
   @Post()
-  create(@Body() createInvoiceDto: CreateInvoiceDto, @CompanyContext() company: Prisma.CompanyCreateInput) {
+  create(
+    @Body() createInvoiceDto: CreateInvoiceDto,
+    @CompanyContext() company: Prisma.CompanyCreateInput,
+  ) {
     createInvoiceDto.companyId = company.id;
     return this.invoiceService.create(createInvoiceDto);
   }
 
   @Post('additional')
-  createAdditional(@Body() createInvoiceDto: CreateInvoiceAddtionalDto, @CompanyContext() company: Prisma.CompanyCreateInput) {
+  createAdditional(
+    @Body() createInvoiceDto: CreateInvoiceAddtionalDto,
+    @CompanyContext() company: Prisma.CompanyCreateInput,
+  ) {
     createInvoiceDto.companyId = company.id;
     return this.invoiceService.createAdditional(createInvoiceDto);
   }
@@ -46,12 +52,9 @@ export class InvoiceController {
   @Get()
   findAll(
     @Query() query: PaginationDto,
-    @CompanyContext() company: Prisma.CompanyCreateInput
+    @CompanyContext() company: Prisma.CompanyCreateInput,
   ) {
-    return this.invoiceService.findAll(
-      query,
-      company
-    );
+    return this.invoiceService.findAll(query, company);
   }
 
   @Get('all')
@@ -59,14 +62,16 @@ export class InvoiceController {
     return this.invoiceService.getAllInvoice(company);
   }
 
-
   @Post('adjusment')
   approve(@Body() approveDto: ApproveInvoiceDto) {
     return this.invoiceService.approve(approveDto);
   }
 
   @Get('/statuses/:status')
-  getByStatus(@Param('status') status: Prisma.EnumInvoiceStatusFilter | InvoiceStatus, @CompanyContext() company: Prisma.CompanyCreateInput) {
+  getByStatus(
+    @Param('status') status: Prisma.EnumInvoiceStatusFilter | InvoiceStatus,
+    @CompanyContext() company: Prisma.CompanyCreateInput,
+  ) {
     return this.invoiceService.getByStatus(status, company);
   }
 
@@ -81,7 +86,10 @@ export class InvoiceController {
   }
 
   @Patch('additional/:id')
-  updateAdditional(@Param('id') id: string, @Body() updateInvoiceDto: UpdateInvoiceAdditonalDto) {
+  updateAdditional(
+    @Param('id') id: string,
+    @Body() updateInvoiceDto: UpdateInvoiceAdditonalDto,
+  ) {
     return this.invoiceService.updateAdditional(id, updateInvoiceDto);
   }
 

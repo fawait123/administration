@@ -10,16 +10,14 @@ import { UpdateRoleDto } from './dto/update-role.dto';
 
 @Injectable()
 export class RoleService {
-  constructor(
-    private readonly prismaService: PrismaService
-  ) { }
+  constructor(private readonly prismaService: PrismaService) {}
 
   async create(createRole: CreateRoleDto) {
     const exist = await this.prismaService.role.findFirst({
       where: {
-        name: createRole.name
-      }
-    })
+        name: createRole.name,
+      },
+    });
 
     if (exist) {
       throw new BadRequestException('Data role sudah digunakan');
@@ -30,53 +28,55 @@ export class RoleService {
         data: {
           name: createRole.name,
           access: createRole.access,
-        }
-      })
+        },
+      });
 
-      const companies = await Promise.all(
-        [
-          createRole.companies.map(async (item) => {
-            return await this.prismaService.roleCompanies.create({
-              data: {
-                roleId: role.id,
-                companyId: item
-              }
-            })
-          })
-        ]
-      )
+      const companies = await Promise.all([
+        createRole.companies.map(async (item) => {
+          return await this.prismaService.roleCompanies.create({
+            data: {
+              roleId: role.id,
+              companyId: item,
+            },
+          });
+        }),
+      ]);
 
-      return { role, companies }
-    })
+      return { role, companies };
+    });
 
-    return new ResponseHelper({ data: transaction })
+    return new ResponseHelper({ data: transaction });
   }
 
-  async findAll(
-    query: PaginationDto,
-  ) {
-    return paginate<Prisma.RoleFindManyArgs>(this.prismaService.role, new StatementScopeHelper<Prisma.RoleFindManyArgs>({ params: query }, ['name']), {
-      where: {
-        ...query.where,
+  async findAll(query: PaginationDto) {
+    return paginate<Prisma.RoleFindManyArgs>(
+      this.prismaService.role,
+      new StatementScopeHelper<Prisma.RoleFindManyArgs>({ params: query }, [
+        'name',
+      ]),
+      {
+        where: {
+          ...query.where,
+        },
+        include: {
+          companies: true,
+        },
       },
-      include: {
-        companies: true
-      }
-    })
+    );
   }
 
   async findOne(id: string) {
     const role = await this.prismaService.role.findUnique({
       where: {
-        id
-      }
-    })
+        id,
+      },
+    });
 
     if (!role) {
       throw new BadRequestException('Data pengguna tidak ditemukan');
     }
 
-    return role
+    return role;
   }
 
   async update(id: string, updateRoleDto: UpdateRoleDto) {
@@ -87,41 +87,39 @@ export class RoleService {
           access: updateRoleDto.access,
         },
         where: {
-          id
-        }
-      })
+          id,
+        },
+      });
 
       await this.prismaService.roleCompanies.deleteMany({
         where: {
-          roleId: role.id
-        }
-      })
+          roleId: role.id,
+        },
+      });
 
-      const companies = await Promise.all(
-        [
-          updateRoleDto.companies.map(async (item) => {
-            return await this.prismaService.roleCompanies.create({
-              data: {
-                roleId: role.id,
-                companyId: item
-              }
-            })
-          })
-        ]
-      )
+      const companies = await Promise.all([
+        updateRoleDto.companies.map(async (item) => {
+          return await this.prismaService.roleCompanies.create({
+            data: {
+              roleId: role.id,
+              companyId: item,
+            },
+          });
+        }),
+      ]);
 
-      return { role, companies }
-    })
+      return { role, companies };
+    });
 
-    return new ResponseHelper({ data: transaction })
+    return new ResponseHelper({ data: transaction });
   }
 
   async remove(id: string) {
     const role = await this.prismaService.role.findUnique({
       where: {
-        id
-      }
-    })
+        id,
+      },
+    });
 
     if (!role) {
       throw new BadRequestException('Data pengguna tidak ditemukan');
@@ -129,15 +127,15 @@ export class RoleService {
 
     await this.prismaService.roleCompanies.deleteMany({
       where: {
-        roleId: id
-      }
-    })
+        roleId: id,
+      },
+    });
 
     const deleteRole = await this.prismaService.role.delete({
       where: {
-        id
-      }
-    })
+        id,
+      },
+    });
 
     return deleteRole;
   }

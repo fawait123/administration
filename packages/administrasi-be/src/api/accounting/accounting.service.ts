@@ -9,9 +9,7 @@ import { StatementScopeHelper } from 'libs/helpers/statement-scope.helper';
 
 @Injectable()
 export class AccountingService {
-  constructor(
-    private readonly prismaService: PrismaService
-  ) { }
+  constructor(private readonly prismaService: PrismaService) {}
   async create(createAccountingDto: CreateAccountingDto) {
     return this.prismaService.$transaction(async (t) => {
       const accounting = await t.accounting.create({
@@ -19,59 +17,61 @@ export class AccountingService {
           companyId: createAccountingDto.companyId,
           invoiceId: createAccountingDto.invoiceId,
           date: new Date(),
-        }
-      })
+        },
+      });
 
       const details = createAccountingDto.details.map((item) => {
         return {
           ...item,
-          accountingId: accounting.id
-        }
-      })
+          accountingId: accounting.id,
+        };
+      });
 
       const accountingDetails = await t.accountingDetail.createMany({
-        data: details
-      })
+        data: details,
+      });
 
-      return { accounting, accountingDetails }
-    })
+      return { accounting, accountingDetails };
+    });
   }
 
-  findAll(
-    query: PaginationDto,
-    company: Prisma.CompanyCreateInput
-  ) {
-    this.prismaService.memberWorkResult.findMany({
-
-    })
-    return paginate<Prisma.AccountingFindManyArgs>(this.prismaService.accounting, new StatementScopeHelper<Prisma.AccountingFindManyArgs>({ params: query }, ['name']), {
-      include: {
-        invoice: true,
-        company: true
+  findAll(query: PaginationDto, company: Prisma.CompanyCreateInput) {
+    this.prismaService.memberWorkResult.findMany({});
+    return paginate<Prisma.AccountingFindManyArgs>(
+      this.prismaService.accounting,
+      new StatementScopeHelper<Prisma.AccountingFindManyArgs>(
+        { params: query },
+        ['name'],
+      ),
+      {
+        include: {
+          invoice: true,
+          company: true,
+        },
+        where: {
+          companyId: company.id,
+        },
       },
-      where: {
-        companyId: company.id
-      }
-    })
+    );
   }
 
   async findOne(id: string) {
     const company = await this.prismaService.accounting.findUnique({
       where: {
-        id
+        id,
       },
       include: {
         invoice: true,
         company: true,
-        AccountingDetail: true
-      }
-    })
+        AccountingDetail: true,
+      },
+    });
 
     if (!company) {
       throw new BadRequestException('Data perusahaan tidak ditemukan');
     }
 
-    return company
+    return company;
   }
 
   update(id: number, updateAccountingDto: UpdateAccountingDto) {

@@ -1,14 +1,23 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { PaginationDto } from 'libs/dto/pagination.dto';
 
-@ApiTags("user")
+@ApiTags('user')
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) { }
+  constructor(private readonly userService: UserService) {}
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
@@ -16,9 +25,7 @@ export class UserController {
   }
 
   @Get()
-  findAll(
-    @Query() query: PaginationDto
-  ) {
+  findAll(@Query() query: PaginationDto) {
     return this.userService.findAll(query);
   }
 

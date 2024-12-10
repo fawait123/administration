@@ -228,12 +228,12 @@ const handleSubmit = async () => {
                     invoiceRetensi:
                         formRef.value.invoiceRetensi.filter((el) => el.note != '').length > 0
                             ? formRef.value.invoiceRetensi.map((item) => {
-                                  return {
-                                      note: item.note,
-                                      amount: +item.amount,
-                                      id: item.id
-                                  };
-                              })
+                                return {
+                                    note: item.note,
+                                    amount: +item.amount,
+                                    id: item.id
+                                };
+                            })
                             : []
                 }
             });
@@ -307,106 +307,59 @@ defineExpose({ generateDataActivity, formRef, selectedOptions, dataTobeDeleted, 
             </div>
             <div class="card">
                 <div class="grid grid-cols-1">
-                    <CustomInputGroup type="text" placeholder="Masukan Nomor Invoice" label="Nomor Invoice" v-model="formRef.number" :invalid="!!getError('number')" :error-message="getError('number')" class-name="mb-8" />
+                    <CustomInputGroup type="text" placeholder="Masukan Nomor Invoice" label="Nomor Invoice"
+                        v-model="formRef.number" :invalid="!!getError('number')" :error-message="getError('number')"
+                        class-name="mb-8" />
                 </div>
             </div>
             <h6 class="font-semibold text-xl mb-2">INVOICE KEGIATAN</h6>
             <div class="card relative" v-for="(activity, i) in formRef.invoiceActivites" :key="i">
                 <div class="grid grid-cols-3 gap-4">
                     <div class="flex flex-col gap-8">
-                        <CustomInputGroup
-                            label="Nomor BAP"
-                            :invalid="!!getErros('invoiceActivites', 'bapNumber', i)"
-                            :name="`plot[${[i]}]`"
-                            :error-message="getErros('invoiceActivites', 'bapNumber', i)"
-                            v-model="activity.bapNumber"
-                            type="text"
-                            placeholder="Nomor BAP"
-                            class="w-full"
-                        />
+                        <CustomInputGroup label="Nomor BAP" :invalid="!!getErros('invoiceActivites', 'bapNumber', i)"
+                            :name="`plot[${[i]}]`" :error-message="getErros('invoiceActivites', 'bapNumber', i)"
+                            v-model="activity.bapNumber" type="text" placeholder="Nomor BAP" class="w-full" />
 
-                        <CustomInputGroup
-                            label="Luas"
-                            :error-message="getErros('invoiceActivites', 'wide', i)"
-                            @input="calculateWide(activity.wide, i)"
-                            :name="`wide[${[i]}]`"
-                            :invalid="!!getErros('invoiceActivites', 'wide', i)"
-                            v-model="activity.wide"
-                            type="number"
-                            placeholder="Luas"
-                            class="w-full"
-                        />
+                        <CustomInputGroup label="Luas" :error-message="getErros('invoiceActivites', 'wide', i)"
+                            @input="calculateWide(activity.wide, i)" :name="`wide[${[i]}]`"
+                            :invalid="!!getErros('invoiceActivites', 'wide', i)" v-model="activity.wide" type="number"
+                            placeholder="Luas" class="w-full" />
                     </div>
                     <div class="flex flex-col gap-8">
-                        <CustomInputGroup
-                            label="Zona"
-                            :error-message="getErros('invoiceActivites', 'zone', i)"
-                            :name="`zone[${[i]}]`"
-                            :invalid="!!getErros('invoiceActivites', 'zone', i)"
-                            v-model="activity.zone"
-                            type="text"
-                            placeholder="zone"
-                            class="w-full"
-                        />
+                        <CustomInputGroup label="Zona" :error-message="getErros('invoiceActivites', 'zone', i)"
+                            :name="`zone[${[i]}]`" :invalid="!!getErros('invoiceActivites', 'zone', i)"
+                            v-model="activity.zone" type="text" placeholder="zone" class="w-full" />
 
-                        <CustomInputGroup
-                            label="Harga"
-                            :error-message="getErros('invoiceActivites', 'price', i)"
-                            @input="calculateprice(activity.price, i)"
-                            :name="`price[${[i]}]`"
-                            :invalid="!!getErros('invoiceActivites', 'price', i)"
-                            v-model="activity.price"
-                            type="number"
-                            placeholder="Harga"
-                            class="w-full"
-                        />
+                        <CustomInputGroup label="Harga" :error-message="getErros('invoiceActivites', 'price', i)"
+                            @input="calculateprice(activity.price, i)" :name="`price[${[i]}]`"
+                            :invalid="!!getErros('invoiceActivites', 'price', i)" v-model="activity.price" type="number"
+                            placeholder="Harga" class="w-full" />
                     </div>
                     <div class="flex flex-col gap-8">
-<!--                        <CustomMultiSelectGroup-->
-<!--                            :editable="true"-->
-<!--                            label="Pilih Hasil kerja Anggota"-->
-<!--                            @handleChange="handleChangeMemberWork(activity.details, i)"-->
-<!--                            :options="memberWorkResultData"-->
-<!--                            option-label="label"-->
-<!--                            option-value="value"-->
-<!--                            :error-message="getErros('invoiceActivites', 'details', i)"-->
-<!--                            :name="`activity[${[i]}]`"-->
-<!--                            :invalid="!!getErros('invoiceActivites', 'details', i)"-->
-<!--                            v-model="activity.details"-->
-<!--                            type="text"-->
-<!--                            placeholder="Hasil Kerja Anggota"-->
-<!--                            class="w-full"-->
-<!--                        />-->
-                        <CustomSelectGroup
-                            @valueChange="(value: any) => handleSelectOption(i, value)"
-                            :editable="true"
-                            label="Pilih Aktifitas"
-                            :options="availableOptions(i)"
-                            option-label="name"
-                            option-value="id"
-                            :error-message="getErros('invoiceActivites', 'activityId', i)"
-                            :name="`activity[${[i]}]`"
-                            :invalid="!!getErros('invoiceActivites', 'activityId', i)"
-                            v-model="activity.activityId"
-                            type="text"
-                            placeholder="Kegiatan"
-                            class="w-full"
-                        />
+                        <CustomSelectGroup @valueChange="(value: any) => handleSelectOption(i, value)" :editable="true"
+                            label="Pilih Aktifitas" :options="availableOptions(i)" option-label="name" option-value="id"
+                            :error-message="getErros('invoiceActivites', 'activityId', i)" :name="`activity[${[i]}]`"
+                            :invalid="!!getErros('invoiceActivites', 'activityId', i)" v-model="activity.activityId"
+                            type="text" placeholder="Kegiatan" class="w-full" />
 
                         <div class="flex-auto">
                             <label for="ssn" class="font-bold block">Jumlah</label>
-                            <InputNumber id="ssn" v-model="activity.total" mode="currency" currency="IDR" readonly placeholder="999-99-9999" fluid />
+                            <InputNumber id="ssn" v-model="activity.total" mode="currency" currency="IDR" readonly
+                                placeholder="999-99-9999" fluid />
                         </div>
                     </div>
                     <div class="flex gap-8">
 
                         <div class="flex items-center gap-2">
-                            <Checkbox binary :inputId="`retensi${i}`" @value-change="(value: boolean) => handleRetensi(value, activity, i)" v-model="activity.retensi" />
+                            <Checkbox binary :inputId="`retensi${i}`"
+                                @value-change="(value: boolean) => handleRetensi(value, activity, i)"
+                                v-model="activity.retensi" />
                             <label :for="`retensi${i}`">Retensi</label>
                         </div>
                     </div>
                 </div>
-                <div class="w-10 h-10 rounded-full text-white flex justify-center items-center absolute top-[-10px] right-[-5px] cursor-pointer" @click="handlePlusMinusActivity(i, activity)" :class="i == 0 ? 'bg-primary' : 'bg-red-500'">
+                <div class="w-10 h-10 rounded-full text-white flex justify-center items-center absolute top-[-10px] right-[-5px] cursor-pointer"
+                    @click="handlePlusMinusActivity(i, activity)" :class="i == 0 ? 'bg-primary' : 'bg-red-500'">
                     <span :class="i == 0 ? 'pi pi-plus' : 'pi pi-minus'"></span>
                 </div>
             </div>
@@ -414,29 +367,16 @@ defineExpose({ generateDataActivity, formRef, selectedOptions, dataTobeDeleted, 
             <div class="card relative" v-for="(retensi, i) in formRef.invoiceRetensi" :key="i">
                 <div class="grid grid-cols-1 gap-4">
                     <div class="grid grid-cols-2 gap-8">
-                        <CustomInputGroup
-                            label="Keterangan"
-                            :invalid="!!getErros('invoiceRetensi', 'note', i)"
-                            :name="`plot[${[i]}]`"
-                            :error-message="getErros('invoiceRetensi', 'note', i)"
-                            v-model="retensi.note"
-                            type="text"
-                            placeholder="Keterangan"
-                            class="w-full"
-                        />
-                        <CustomInputGroup
-                            label="Jumlah"
-                            :invalid="!!getErros('invoiceRetensi', 'amount', i)"
-                            :name="`plot[${[i]}]`"
-                            :error-message="getErros('invoiceRetensi', 'amount', i)"
-                            v-model="retensi.amount"
-                            type="text"
-                            placeholder="Jumlah"
-                            class="w-full"
-                        />
+                        <CustomInputGroup label="Keterangan" :invalid="!!getErros('invoiceRetensi', 'note', i)"
+                            :name="`plot[${[i]}]`" :error-message="getErros('invoiceRetensi', 'note', i)"
+                            v-model="retensi.note" type="text" placeholder="Keterangan" class="w-full" />
+                        <CustomInputGroup label="Jumlah" :invalid="!!getErros('invoiceRetensi', 'amount', i)"
+                            :name="`plot[${[i]}]`" :error-message="getErros('invoiceRetensi', 'amount', i)"
+                            v-model="retensi.amount" type="text" placeholder="Jumlah" class="w-full" />
                     </div>
                 </div>
-                <div class="w-10 h-10 rounded-full text-white flex justify-center items-center absolute top-[-10px] right-[-5px] cursor-pointer" @click="handlePlusMinusRetensi(i, activity)" :class="i == 0 ? 'bg-primary' : 'bg-red-500'">
+                <div class="w-10 h-10 rounded-full text-white flex justify-center items-center absolute top-[-10px] right-[-5px] cursor-pointer"
+                    @click="handlePlusMinusRetensi(i, activity)" :class="i == 0 ? 'bg-primary' : 'bg-red-500'">
                     <span :class="i == 0 ? 'pi pi-plus' : 'pi pi-minus'"></span>
                 </div>
             </div>
@@ -448,7 +388,8 @@ defineExpose({ generateDataActivity, formRef, selectedOptions, dataTobeDeleted, 
             </div>
         </div>
         <Dialog v-model:visible="deleteModal" :style="{ width: '450px' }" header="Hapus data ?" :modal="true">
-            <span>Apakah kamu yakin ingin menghapus data <span class="font-bold">(Data di dalam database akan ikut terhapus)</span>?</span>
+            <span>Apakah kamu yakin ingin menghapus data <span class="font-bold">(Data di dalam database akan ikut
+                    terhapus)</span>?</span>
 
             <template #footer>
                 <Button label="Yes" icon="pi pi-check" text @click="handleDelete" />

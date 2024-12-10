@@ -8,7 +8,7 @@ import { NotificationFilter } from '../notification/dto/push.dto';
 
 @Controller('worksheet')
 export class WorksheetController {
-  constructor(private readonly worksheetService: WorksheetService) { }
+  constructor(private readonly worksheetService: WorksheetService) {}
 
   @Get('member-work-result/:id')
   memberWorkResult(@Res() res: Response, @Param('id') id: string) {
@@ -30,7 +30,7 @@ export class WorksheetController {
   notification(
     @CompanyContext() company: Prisma.CompanyCreateInput,
     @Res() res: Response,
-    @Query() query: NotificationFilter
+    @Query() query: NotificationFilter,
   ) {
     return this.worksheetService.exportNotification(res, company, query);
   }

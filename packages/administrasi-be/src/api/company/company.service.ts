@@ -9,49 +9,52 @@ import { StatementScopeHelper } from 'libs/helpers/statement-scope.helper';
 
 @Injectable()
 export class CompanyService {
-  constructor(
-    private readonly prismaService: PrismaService
-  ) { }
+  constructor(private readonly prismaService: PrismaService) {}
   async create(createCompany: Prisma.CompanyCreateInput) {
     return await this.prismaService.company.create({
-      data: createCompany
-    })
+      data: createCompany,
+    });
   }
 
-  async findAll(
-    query: PaginationDto
-  ) {
+  async findAll(query: PaginationDto) {
     if (!query.where) {
-      query.where = {}
+      query.where = {};
     }
 
-    return paginate(this.prismaService.company, new StatementScopeHelper<Prisma.CompanyFindFirstArgs>({ params: query }, ['name', 'address']), {
-      where: {
-        ...query.where
-      }
-    })
+    return paginate(
+      this.prismaService.company,
+      new StatementScopeHelper<Prisma.CompanyFindFirstArgs>({ params: query }, [
+        'name',
+        'address',
+      ]),
+      {
+        where: {
+          ...query.where,
+        },
+      },
+    );
   }
 
   async findOne(id: string) {
     const company = await this.prismaService.company.findUnique({
       where: {
-        id
-      }
-    })
+        id,
+      },
+    });
 
     if (!company) {
       throw new BadRequestException('Data perusahaan tidak ditemukan');
     }
 
-    return company
+    return company;
   }
 
   async update(id: string, updateCompanyDto: Prisma.CompanyUpdateInput) {
     const company = await this.prismaService.company.findUnique({
       where: {
-        id
-      }
-    })
+        id,
+      },
+    });
 
     if (!company) {
       throw new BadRequestException('Data perusahaan tidak ditemukan');
@@ -59,19 +62,19 @@ export class CompanyService {
 
     const companyUpdate = await this.prismaService.company.update({
       where: {
-        id
+        id,
       },
-      data: updateCompanyDto
-    })
+      data: updateCompanyDto,
+    });
     return companyUpdate;
   }
 
   async remove(id: string) {
     const company = await this.prismaService.company.findUnique({
       where: {
-        id
-      }
-    })
+        id,
+      },
+    });
 
     if (!company) {
       throw new BadRequestException('Data perusahaan tidak ditemukan');
@@ -79,9 +82,9 @@ export class CompanyService {
 
     const deleteCompany = await this.prismaService.company.delete({
       where: {
-        id
-      }
-    })
+        id,
+      },
+    });
     return deleteCompany;
   }
 }

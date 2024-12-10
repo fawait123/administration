@@ -24,8 +24,8 @@ async function bootstrap() {
         content: document,
       },
     }),
-  )
-  const configService = new ConfigService()
+  );
+  const configService = new ConfigService();
   const port = configService.get('PORT') || 3000;
   // app.useGlobalFilters(new HttpExeptionFilter());
 

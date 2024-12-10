@@ -5,11 +5,22 @@ model Activity {
   createdAt            DateTime                   @default(now())
   updatedAt            DateTime                   @default(now())
   companyId            String
+  parentId             String?
   type                 Type                       @default(DEFAULT)
   memberWorkActivities MemberWorkResultActivity[]
   company              Company?                   @relation(fields: [companyId], references: [id])
   invoiceActivities    InvoiceActivity[]
   invoiceAdditionals   InvoiceAdditional[]
+  childrens            ActivityGroup[]
+}
+
+model ActivityGroup {
+  id        String   @id @default(uuid())
+  parentId  String
+  childId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  activity  Activity @relation(fields: [parentId], references: [id])
 }
 
 enum Type {

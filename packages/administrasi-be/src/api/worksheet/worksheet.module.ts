@@ -6,6 +6,6 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 @Module({
   controllers: [WorksheetController],
   providers: [WorksheetService],
-  imports: [PrismaModule]
+  imports: [PrismaModule],
 })
-export class WorksheetModule { }
+export class WorksheetModule {}

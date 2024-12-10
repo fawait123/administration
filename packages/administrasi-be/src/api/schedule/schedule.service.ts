@@ -57,7 +57,7 @@ export class ScheduleService {
                             aktifitas <span class="font-bold text-primary">${item.total_activity}</span> dan total penagihan sebesar <span class="font-bold text-primary">${formatRupiah(+item.total_amount)}</span> yang belum dibayar`,
           date: moment().add('1', 'days').toDate(),
           companyId: companyId,
-          additional: item.additional
+          additional: item.additional,
         });
         this.logger.debug(
           `sending notification invoice ${item.number_invoice}`,
@@ -84,15 +84,88 @@ export class ScheduleService {
         companyId: string;
         additional: string;
       }[]
-    >`select mwr.date, e.name,mwr.companyId, CONCAT(mwra2.plot,'|',a.name) additional, 
-        (SELECT ia.status AS total FROM InvoiceActivity ia WHERE ia.zone = mwra2.plot AND ia.activityId = mwra2.activityId AND ia.status = 'APPROVE' LIMIT 1) status_approve,
-        (SELECT ia.status AS total FROM InvoiceActivity ia WHERE ia.zone = mwra2.plot AND ia.activityId = mwra2.activityId AND ia.status = 'REJECT' LIMIT 1) status_reject,
-        (select count(mwra.id) from MemberWorkResultActivity mwra where mwra.memberWorkResultId = mwr.id) total_activity
-        from MemberWorkResult mwr 
-        left join Employee e on e.id  = mwr.employeeId 
-        left join MemberWorkResultActivity mwra2 on mwra2.memberWorkResultId = mwr.id
-        left join Activity a on a.id  = mwra2.ActivityId 
-        having status_approve is NULL and status_reject is null`;
+    >`select 
+        mwr.date, 
+        e.name, 
+        mwr.companyId, 
+        CONCAT(mwra2.plot, '|', a.name) additional, 
+        (
+          select 
+            t.status 
+          from 
+            (
+              select 
+                ia.status, 
+                ag.childId activityId, 
+                ia.zone 
+              from 
+                InvoiceActivity ia 
+                left join ActivityGroup ag on ag.parentId = ia.activityId 
+              where 
+                ia.status = 'APPROVE' 
+              UNION ALL 
+              select 
+                ia.status, 
+                ia.activityId activityId, 
+                ia.zone 
+              from 
+                InvoiceActivity ia 
+              where 
+                ia.status = 'APPROVE'
+            ) t 
+          where 
+            t.zone = mwra2.plot 
+            and t.activityId = mwra2.activityId 
+          limit 
+            1
+        ) status_approve, 
+        (
+          select 
+            t.status 
+          from 
+            (
+              select 
+                ia.status, 
+                ag.childId activityId, 
+                ia.zone 
+              from 
+                InvoiceActivity ia 
+                left join ActivityGroup ag on ag.parentId = ia.activityId 
+              where 
+                ia.status = 'REJECT' 
+              UNION ALL 
+              select 
+                ia.status, 
+                ia.activityId activityId, 
+                ia.zone 
+              from 
+                InvoiceActivity ia 
+              where 
+                ia.status = 'REJECT'
+            ) t 
+          where 
+            t.zone = mwra2.plot 
+            and t.activityId = mwra2.activityId 
+          limit 
+            1
+        ) status_reject, 
+        (
+          select 
+            count(mwra.id) 
+          from 
+            MemberWorkResultActivity mwra 
+          where 
+            mwra.memberWorkResultId = mwr.id
+        ) total_activity 
+      from 
+        MemberWorkResult mwr 
+        left join Employee e on e.id = mwr.employeeId 
+        left join MemberWorkResultActivity mwra2 on mwra2.memberWorkResultId = mwr.id 
+        left join Activity a on a.id = mwra2.ActivityId 
+      having 
+        status_approve is NULL 
+        and status_reject is null
+      `;
 
     const now = moment();
     await Promise.all(
@@ -104,7 +177,7 @@ export class ScheduleService {
                             <span class="font-bold text-primary">${item.name}</span> dengan aktifitas <span class="font-bold text-primary">${plot} ${activityName}</span>, Pembayaran belum dilakukan sejak <span class="font-bold text-primary">${now.diff(item.date, 'days')}</span> hari yang lalu`,
           date: moment().add('1', 'days').toDate(),
           companyId: item.companyId,
-          additional: item.additional
+          additional: item.additional,
         });
         this.logger.debug(`sending notification ${item.name}`);
       }),

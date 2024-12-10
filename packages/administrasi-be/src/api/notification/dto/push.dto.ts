@@ -1,32 +1,38 @@
-import { Allow, IsBoolean, IsDate, IsNotEmpty, IsOptional, IsString } from "class-validator"
+import {
+  Allow,
+  IsBoolean,
+  IsDate,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class PushNotificationDto {
-    @IsNotEmpty()
-    @IsString()
-    title: string
+  @IsNotEmpty()
+  @IsString()
+  title: string;
 
-    @IsNotEmpty()
-    @IsString()
-    body: string
+  @IsNotEmpty()
+  @IsString()
+  body: string;
 
-    @IsNotEmpty()
-    @IsDate()
-    date: Date
+  @IsNotEmpty()
+  @IsDate()
+  date: Date;
 
-    @IsNotEmpty()
-    @IsString()
-    companyId: string;
+  @IsNotEmpty()
+  @IsString()
+  companyId: string;
 
-    @IsOptional()
-    additional?: string | Record<string, any>
+  @IsOptional()
+  additional?: string | Record<string, any>;
 }
 
-
 export class NotificationFilter {
-    @Allow()
-    @IsBoolean()
-    _where: boolean = true;
+  @Allow()
+  @IsBoolean()
+  _where: boolean = true;
 
-    @IsOptional()
-    where: Record<string, any>
+  @IsOptional()
+  where: Record<string, any>;
 }

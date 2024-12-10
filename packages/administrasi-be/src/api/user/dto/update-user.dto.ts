@@ -4,10 +4,10 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {
-    @ApiProperty({
-        example: "123@Password"
-    })
-    @IsOptional()
-    @IsString()
-    password: string;
+  @ApiProperty({
+    example: '123@Password',
+  })
+  @IsOptional()
+  @IsString()
+  password: string;
 }

@@ -16,7 +16,7 @@ export class NotificationService {
         body: pushNotificationDto.body,
         date: pushNotificationDto.date,
         companyId: pushNotificationDto.companyId,
-        additional: pushNotificationDto.additional
+        additional: pushNotificationDto.additional,
       },
     });
 
@@ -30,7 +30,7 @@ export class NotificationService {
     const prisma = new PrismaClient();
 
     if (!query.where) {
-      query.where = {}
+      query.where = {};
     }
 
     return paginate<Prisma.NotificationFindManyArgs>(
@@ -42,7 +42,7 @@ export class NotificationService {
       {
         where: {
           companyId: company.id,
-          ...query.where
+          ...query.where,
         },
         orderBy: {
           createdAt: 'desc',

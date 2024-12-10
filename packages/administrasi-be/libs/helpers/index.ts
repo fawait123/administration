@@ -1,2 +1,2 @@
-export * from './file-system.helper'
-export * from './string.helper'
+export * from './file-system.helper';
+export * from './string.helper';

@@ -7,10 +7,10 @@ import { CompanyGuard } from 'libs/guard/company-guard/company.guard';
 @UseGuards(CompanyGuard)
 @Controller('dashboard')
 export class DashboardController {
-  constructor(private readonly dashboardService: DashboardService) { }
+  constructor(private readonly dashboardService: DashboardService) {}
 
   @Get('card')
   getCardData(@CompanyContext() company: Prisma.CompanyCreateInput) {
-    return this.dashboardService.getCardData(company)
+    return this.dashboardService.getCardData(company);
   }
 }

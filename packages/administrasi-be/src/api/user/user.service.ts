@@ -8,15 +8,14 @@ import { hash } from 'libs/helpers/encryption.helper';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prismaService: PrismaService) { }
-
+  constructor(private readonly prismaService: PrismaService) {}
 
   async create(createUserDto: Prisma.UserCreateInput) {
     const username = await this.prismaService.user.findFirst({
       where: {
-        username: createUserDto.username
-      }
-    })
+        username: createUserDto.username,
+      },
+    });
 
     if (username) {
       throw new BadRequestException('Username sudah terdaftar');
@@ -24,9 +23,9 @@ export class UserService {
 
     const email = await this.prismaService.user.findFirst({
       where: {
-        email: createUserDto.email
-      }
-    })
+        email: createUserDto.email,
+      },
+    });
 
     if (email) {
       throw new BadRequestException('Email sudah terdaftar');
@@ -35,63 +34,67 @@ export class UserService {
     return await this.prismaService.user.create({
       data: {
         ...createUserDto,
-        password: await hash(createUserDto.password)
-      }
-    })
+        password: await hash(createUserDto.password),
+      },
+    });
   }
 
-  async findAll(
-    query: PaginationDto
-  ) {
-    return paginate(this.prismaService.user, new StatementScopeHelper<Prisma.UserFindManyArgs>({ params: query }, ['username', 'email']))
+  async findAll(query: PaginationDto) {
+    return paginate(
+      this.prismaService.user,
+      new StatementScopeHelper<Prisma.UserFindManyArgs>({ params: query }, [
+        'username',
+        'email',
+      ]),
+    );
   }
 
   async findOne(id: string) {
     const user = await this.prismaService.user.findUnique({
       where: {
-        id
-      }
-    })
+        id,
+      },
+    });
 
     if (!user) {
       throw new BadRequestException('Data pengguna tidak ditemukan');
     }
 
-    return user
+    return user;
   }
 
   async update(id: string, updateUserDto: Prisma.UserUpdateInput) {
     const user = await this.prismaService.user.findUnique({
       where: {
-        id
-      }
-    })
+        id,
+      },
+    });
 
     if (!user) {
       throw new BadRequestException('Data pengguna tidak ditemukan');
     }
 
-    const payload: Prisma.UserUpdateInput = Object.assign(user, updateUserDto)
+    const payload: Prisma.UserUpdateInput = Object.assign(user, updateUserDto);
 
     if (updateUserDto.password) {
-      payload.password = await hash(updateUserDto.password as string)
+      payload.password = await hash(updateUserDto.password as string);
     }
 
     const userUpdate = await this.prismaService.user.update({
       where: {
-        id
+        id,
       },
-      data: payload
-    })
+      data: payload,
+    });
     return userUpdate;
   }
 
   async remove(id: string) {
     const user = await this.prismaService.user.findUnique({
       where: {
-        id
-      }
-    })
+        id,
+      },
+    });
 
     if (!user) {
       throw new BadRequestException('Data pengguna tidak ditemukan');
@@ -99,9 +102,9 @@ export class UserService {
 
     const deleteUser = await this.prismaService.user.delete({
       where: {
-        id
-      }
-    })
+        id,
+      },
+    });
     return deleteUser;
   }
 }

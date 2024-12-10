@@ -1,4 +1,4 @@
 export enum InvoiceType {
-    ACTIVITY = "activity",
-    ADDITIONAL = "additional"
+  ACTIVITY = 'activity',
+  ADDITIONAL = 'additional',
 }

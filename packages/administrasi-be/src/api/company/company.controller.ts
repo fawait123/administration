@@ -1,14 +1,23 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { CompanyService } from './company.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { PaginationDto } from 'libs/dto/pagination.dto';
 import { ApiTags } from '@nestjs/swagger';
 
-@ApiTags("Company")
+@ApiTags('Company')
 @Controller('company')
 export class CompanyController {
-  constructor(private readonly companyService: CompanyService) { }
+  constructor(private readonly companyService: CompanyService) {}
 
   @Post()
   create(@Body() createCompanyDto: CreateCompanyDto) {
@@ -16,9 +25,7 @@ export class CompanyController {
   }
 
   @Get()
-  findAll(
-    @Query() params: PaginationDto
-  ) {
+  findAll(@Query() params: PaginationDto) {
     return this.companyService.findAll(params);
   }
 

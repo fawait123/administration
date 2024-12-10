@@ -9,7 +9,7 @@ import { NotificationFilter } from './dto/push.dto';
 @UseGuards(CompanyGuard)
 @Controller('notification')
 export class NotificationController {
-  constructor(private readonly notificationService: NotificationService) { }
+  constructor(private readonly notificationService: NotificationService) {}
   @Get('current')
   getCurrentNotification(
     @Query() params: PaginationDto,

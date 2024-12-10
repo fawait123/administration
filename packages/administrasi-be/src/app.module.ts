@@ -1,4 +1,9 @@
-import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './api/auth/auth.module';
@@ -25,15 +30,13 @@ import { WorksheetModule } from './api/worksheet/worksheet.module';
 @Module({
   imports: [
     ScheduleModule.forRoot(),
-    JwtModule.register(
-      {
-        global: true,
-        secret: JwtConstant.secret,
-        signOptions: {
-          expiresIn: '365d'
-        }
-      }
-    ),
+    JwtModule.register({
+      global: true,
+      secret: JwtConstant.secret,
+      signOptions: {
+        expiresIn: '365d',
+      },
+    }),
     ConfigModule.forRoot({
       isGlobal: true, // Mengatur agar modul ini tersedia di seluruh aplikasi
     }),
@@ -50,19 +53,19 @@ import { WorksheetModule } from './api/worksheet/worksheet.module';
     NotificationModule,
     DashboardModule,
     AccountingModule,
-    WorksheetModule
+    WorksheetModule,
   ],
   controllers: [],
   providers: [AppService, ScheduleService, NotificationService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthMiddleware).exclude(
-      {
+    consumer
+      .apply(AuthMiddleware)
+      .exclude({
         method: RequestMethod.POST,
         path: '/auth/login',
-
-      }
-    ).forRoutes('*')
+      })
+      .forRoutes('*');
   }
 }

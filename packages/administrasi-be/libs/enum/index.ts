@@ -1,1 +1,1 @@
-export * from './type-invoice.enum'
+export * from './type-invoice.enum';
