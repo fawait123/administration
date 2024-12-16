@@ -337,7 +337,7 @@ defineExpose({ generateDataActivity, formRef, selectedOptions, dataTobeDeleted, 
                     </div>
                     <div class="flex flex-col gap-8">
                         <CustomSelectGroup @valueChange="(value: any) => handleSelectOption(i, value)" :editable="true"
-                            label="Pilih Aktifitas" :options="availableOptions(i)" option-label="name" option-value="id"
+                            label="Pilih Aktifitas" :options="activityData" option-label="name" option-value="id"
                             :error-message="getErros('invoiceActivites', 'activityId', i)" :name="`activity[${[i]}]`"
                             :invalid="!!getErros('invoiceActivites', 'activityId', i)" v-model="activity.activityId"
                             type="text" placeholder="Kegiatan" class="w-full" />

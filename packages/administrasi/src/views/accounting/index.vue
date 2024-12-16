@@ -18,6 +18,7 @@ const columns = ref<IColumnTable[]>([
         component: markRaw(InvoiceItem)
     },
 ])
+const visible = ref<boolean>(false)
 
 onMounted(() => {
     if (tableRef.value) {
@@ -25,13 +26,19 @@ onMounted(() => {
     }
 })
 
+const showDrawerAdd = () => {
+    visible.value = true
+}
+
 </script>
 
 
 <template>
     <div class="grid gap-4">
-        <FormAddAccount />
-        <DataTableComponent get-url="accounting" ref="tableRef" :columns="columns" :add-button="false"
-            :delete-button="false" />
+        <Drawer v-model:visible="visible" header="Tambah Laba Rugi" position="right" class="min-w-[60vw] max-w-[60vw]">
+            <FormAddAccount />
+        </Drawer>
+        <DataTableComponent get-url="accounting" ref="tableRef" :columns="columns" :add-button="true"
+            @onAdd="showDrawerAdd" :delete-button="false" />
     </div>
 </template>
