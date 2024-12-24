@@ -9,7 +9,7 @@ import { NotificationFilter } from '../notification/dto/push.dto';
 
 @Injectable()
 export class WorksheetService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService) { }
 
   async getMemberWorkResult(id: string) {
     const exist = await this.prismaService.memberWorkResult.findFirst({
@@ -140,7 +140,7 @@ export class WorksheetService {
         kegiatan: item.activity.name,
         harga: item.price,
         ql: '',
-        jumlah: item.price * item.wide,
+        jumlah: item.price * Number(item.wide),
       };
     });
 
@@ -165,7 +165,7 @@ export class WorksheetService {
     worksheet.mergeCells(`A${cellTotal}:B${cellTotal}`);
     worksheet.getCell(`A${cellTotal}`).value = 'TOTAL LUAS';
     worksheet.getCell(`C${cellTotal}`).value =
-      memberWorkResult.activities.reduce((prev, next) => prev + next.wide, 0);
+      memberWorkResult.activities.reduce((prev, next) => prev + Number(next.wide), 0);
     worksheet.getCell(`D${cellTotal}`).value = '';
     worksheet.mergeCells(`E${cellTotal}:F${cellTotal}`);
     worksheet.getCell(`E${cellTotal}`).value = 'TOTAL';
@@ -572,7 +572,7 @@ export class WorksheetService {
           (prev, next) => prev + next.total,
           0,
         )) /
-        100,
+      100,
     );
     worksheet.getCell(`G${totalCell + 2}`).font = {
       bold: true,
@@ -597,13 +597,13 @@ export class WorksheetService {
     };
     worksheet.getCell(`G${totalCell + 3}`).value = formatRupiah(
       invoice.invoiceActivities.reduce((prev, next) => prev + next.total, 0) -
-        (+getEnv('tax.env', 'TAX_AMOUNT') *
-          invoice.invoiceActivities.reduce(
-            (prev, next) => prev + next.total,
-            0,
-          )) /
-          100 -
-        invoice.invoiceRetensi.reduce((prev, next) => prev + next.amount, 0),
+      (+getEnv('tax.env', 'TAX_AMOUNT') *
+        invoice.invoiceActivities.reduce(
+          (prev, next) => prev + next.total,
+          0,
+        )) /
+      100 -
+      invoice.invoiceRetensi.reduce((prev, next) => prev + next.amount, 0),
     );
     worksheet.getCell(`G${totalCell + 3}`).font = {
       bold: true,
@@ -929,7 +929,7 @@ export class WorksheetService {
           (prev, next) => prev + next.amount,
           0,
         )) /
-        100,
+      100,
     );
     worksheet.getCell(`D${totalCell + 2}`).font = {
       bold: true,
@@ -955,12 +955,12 @@ export class WorksheetService {
     worksheet.mergeCells(`D${totalCell + 3}:G${totalCell + 3}`);
     worksheet.getCell(`D${totalCell + 3}`).value = formatRupiah(
       invoice.invoiceAdditionals.reduce((prev, next) => prev + next.amount, 0) -
-        (+getEnv('tax.env', 'TAX_AMOUNT') *
-          invoice.invoiceAdditionals.reduce(
-            (prev, next) => prev + next.amount,
-            0,
-          )) /
-          100,
+      (+getEnv('tax.env', 'TAX_AMOUNT') *
+        invoice.invoiceAdditionals.reduce(
+          (prev, next) => prev + next.amount,
+          0,
+        )) /
+      100,
     );
     worksheet.getCell(`D${totalCell + 3}`).font = {
       bold: true,
