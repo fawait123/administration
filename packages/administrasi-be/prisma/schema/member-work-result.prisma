@@ -14,7 +14,7 @@ model MemberWorkResult {
 model MemberWorkResultActivity {
     id                     String                  @id @default(uuid())
     plot                   String
-    wide                   Int
+    wide                   Decimal
     price                  Int
     ActivityId             String
     ql                     String

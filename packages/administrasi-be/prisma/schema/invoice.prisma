@@ -17,7 +17,7 @@ model InvoiceActivity {
     id         String                  @id @default(uuid())
     bapNumber  String
     zone       String
-    wide       Int
+    wide       Decimal
     price      Int
     total      Int
     status     InvoiceStatus?          @default(NEEDAPPROVAL)
