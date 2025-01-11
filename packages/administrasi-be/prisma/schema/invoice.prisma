@@ -1,16 +1,17 @@
 model Invoice {
-    id                 String              @id @default(uuid())
-    number             String
-    companyId          String
-    createdAt          DateTime            @default(now())
-    updatedAt          DateTime            @default(now())
-    invoiceActivities  InvoiceActivity[]
-    invoiceAdditionals InvoiceAdditional[]
-    Company            Company?            @relation(fields: [companyId], references: [id])
-    type               InvoiceType?        @default(ACTIVITY)
-    status             Boolean             @default(false)
-    Accounting         Accounting[]
-    invoiceRetensi     InvoiceRetensi[]
+    id                     String                 @id @default(uuid())
+    number                 String
+    companyId              String
+    createdAt              DateTime               @default(now())
+    updatedAt              DateTime               @default(now())
+    invoiceActivities      InvoiceActivity[]
+    invoiceAdditionals     InvoiceAdditional[]
+    Company                Company?               @relation(fields: [companyId], references: [id])
+    type                   InvoiceType?           @default(ACTIVITY)
+    status                 Boolean                @default(false)
+    Accounting             Accounting[]
+    invoiceRetensi         InvoiceRetensi[]
+    profileAndLossInvoices ProfitAndLossInvoice[]
 }
 
 model InvoiceActivity {

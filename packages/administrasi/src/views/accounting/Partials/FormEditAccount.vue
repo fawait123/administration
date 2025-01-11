@@ -7,10 +7,11 @@ import { accountingSchema } from '@/schema';
 import doRequest from '@/helpers/do-request.helper';
 import CustomMultiSelectGroup from '@/components/input/CustomMultiSelectGroup.vue';
 import { useToast } from 'primevue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 const toast = useToast()
 const route = useRouter()
+const router = useRoute()
 
 const invoiceOptions = ref<{
     id: string,
@@ -52,11 +53,28 @@ const getInvoice = async () => {
     })
 }
 
+const getDetail = async () => {
+    try {
+        const response = await doRequest({
+            method: 'GET',
+            url: 'accounting/' + router.params.id
+        })
+
+        const data = response.data
+        formRef.value = {
+            accountName: data.accountName,
+            percentage: String(data.percentage),
+            additionals: data.additionals,
+            invoice: data.profitLooseInvoices.map((item: { invoiceId: string }) => item.invoiceId)
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 const { validate, isValid, getErros, getError, scrolltoError } = useValidation(accountingSchema, formRef, {
     mode: 'lazy'
 });
-
-
 
 
 const handleSubmit = async () => {
@@ -64,8 +82,8 @@ const handleSubmit = async () => {
     if (isValid.value) {
         try {
             await doRequest({
-                url: 'accounting',
-                method: 'POST',
+                url: 'accounting/' + router.params.id,
+                method: 'PATCH',
                 data: {
                     accountName: formRef.value.accountName,
                     percentage: Number(formRef.value.percentage),
@@ -76,7 +94,7 @@ const handleSubmit = async () => {
                 }
             })
 
-            toast.add({ severity: 'success', summary: 'Opps!', detail: 'Data laba rugi berhasil ditambahkan', life: 3000 })
+            toast.add({ severity: 'success', summary: 'Opps!', detail: 'Data laba rugi berhasil diubah', life: 3000 })
             route.push({ name: 'accounting' })
         } catch (error: any) {
             toast.add({ severity: 'error', summary: 'Opps!', detail: error.message, life: 3000 })
@@ -112,6 +130,7 @@ const profit = computed(() => {
 
 onMounted(() => {
     getInvoice()
+    getDetail()
 })
 
 

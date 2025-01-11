@@ -1,0 +1,21 @@
+model ProfitAndLoss {
+    id                  String                 @id @default(uuid())
+    accountName         String
+    percentage          Int
+    additionals         Json
+    total               Int?
+    profit              Int?
+    createdAt           DateTime               @default(now())
+    updatedAt           DateTime               @default(now())
+    profitLooseInvoices ProfitAndLossInvoice[]
+}
+
+model ProfitAndLossInvoice {
+    id              String         @id @default(uuid())
+    ProfitAndLossId String
+    invoiceId       String?
+    createdAt       DateTime       @default(now())
+    updatedAt       DateTime       @default(now())
+    profitAndLoss   ProfitAndLoss? @relation(fields: [ProfitAndLossId], references: [id])
+    invoice         Invoice?       @relation(fields: [invoiceId], references: [id])
+}

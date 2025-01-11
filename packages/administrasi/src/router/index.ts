@@ -120,7 +120,17 @@ const router = createRouter({
                             component: () => import('@/views/accounting/index.vue')
                         },
                         {
-                            path: '/accounting/:id',
+                            path: '/accounting/create',
+                            name: 'accounting-create',
+                            component: () => import('@/views/accounting/create.vue')
+                        },
+                        {
+                            path: '/accounting/edit/:id',
+                            name: 'accounting-edit',
+                            component: () => import('@/views/accounting/edit.vue')
+                        },
+                        {
+                            path: '/accounting/detail/:id',
                             name: 'accounting-detail',
                             component: () => import('@/views/accounting/detail.vue')
                         }

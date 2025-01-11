@@ -20,14 +20,13 @@ import { PaginationDto } from 'libs/dto/pagination.dto';
 @UseGuards(CompanyGuard)
 @Controller('accounting')
 export class AccountingController {
-  constructor(private readonly accountingService: AccountingService) {}
+  constructor(private readonly accountingService: AccountingService) { }
 
   @Post()
   create(
     @Body() createAccountingDto: CreateAccountingDto,
     @CompanyContext() company: Prisma.CompanyCreateInput,
   ) {
-    createAccountingDto.companyId = company.id;
     return this.accountingService.create(createAccountingDto);
   }
 
@@ -49,11 +48,11 @@ export class AccountingController {
     @Param('id') id: string,
     @Body() updateAccountingDto: UpdateAccountingDto,
   ) {
-    return this.accountingService.update(+id, updateAccountingDto);
+    return this.accountingService.update(id, updateAccountingDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.accountingService.remove(+id);
+    return this.accountingService.remove(id);
   }
 }

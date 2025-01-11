@@ -18,5 +18,5 @@ const gotoDetail = () => {
 </script>
 
 <template>
-    <h1 class="text-blue-500 cursor-pointer font-bold" @click="gotoDetail">{{ props.data?.invoice?.number }}</h1>
+    <h1 class="text-blue-500 cursor-pointer font-bold" @click="gotoDetail">{{ props.data?.accountName }}</h1>
 </template>

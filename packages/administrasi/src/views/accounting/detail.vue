@@ -1,28 +1,31 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import doRequest from '@/helpers/do-request.helper';
 import { useRoute } from 'vue-router';
 import { formatRupiah } from '@/helpers';
-import CustomInputGroup from '@/components/input/CustomInputGroup.vue';
 import { useLoadingStore } from '@/store';
 import LoadingComponent from '@/composable/LoadingComponent.vue';
 
 const loading = useLoadingStore()
-const accounting = ref<Record<string, any>>({})
-const drawerAddAccount = ref<boolean>(false)
-const route = useRoute()
-const dataDetail = ref<{
-    name: string,
-    percentage: string,
-    details: {
+const accounting = ref<{
+    id: string,
+    accountName: string,
+    percentage: number,
+    additionals: {
         note: string,
-        amount: string
+        amount: number
+    }[],
+    total: number,
+    profit: number,
+    createdAt: string,
+    updatedAt: string,
+    profitLooseInvoices: {
+        invoice: {
+            number: string
+        }
     }[]
-}>({
-    name: '',
-    percentage: '0',
-    details: []
-})
+} | undefined>()
+const route = useRoute()
 
 onMounted(() => {
     getData()
@@ -36,7 +39,7 @@ const getData = async () => {
             url: "/accounting/" + route.params.id
         })
 
-        accounting.value = response
+        accounting.value = response.data as any
         loading.setLoading(false)
     } catch (error) {
         loading.setLoading(false)
@@ -44,14 +47,9 @@ const getData = async () => {
     }
 }
 
-const handleEdit = (data: Record<string, any>) => {
-    dataDetail.value = {
-        name: data.name,
-        percentage: data.percentage,
-        details: data.expenseDetails
-    };
-    drawerAddAccount.value = true;
-}
+const minus = computed(() => {
+    return accounting.value?.additionals.reduce((prev, next) => prev + next.amount, 0)
+})
 </script>
 
 <template>
@@ -60,42 +58,50 @@ const handleEdit = (data: Record<string, any>) => {
         <div v-else>
             <div class="grid gap-4">
                 <div class="grid grid-cols-1 md:grid-cols-1 gap-4">
-                    <div class="card flex flex-col gap-6">
-                        <h1 class="font-bold text-[16px] text-slate-500">{{ accounting?.invoice?.number }}</h1>
-                        <h1 class="font-bold text-[24px] text-slate-500">{{
-                            formatRupiah(accounting?.AccountingDetail?.reduce((prev: any, next: any) => prev +
-                                next.subTotal, 0)) }}</h1>
+                    <div class="card grid grid-cols-2 gap-6">
+                        <div class="grid gap-3">
+                            <h1 class="font-bold text-[16px] text-slate-500">{{ accounting?.accountName }}</h1>
+                            <h1 class="font-bold text-3xl text-slate-500">{{ formatRupiah(accounting?.profit as
+                                number)
+                                }}<span class="ml-3 text-[10px] align-super">/ {{ formatRupiah(accounting?.total as
+                                    number)
+                                    }}</span>
+                            </h1>
+                        </div>
+
+                        <div class="grid gap-3">
+                            <h1 class="font-bold text-[16px] text-slate-500">Pendapatan Bersih</h1>
+                            <h1 class="text-3xl font-bold text-muted-color">{{
+                                formatRupiah(Number(accounting?.profit) as
+                                    number -
+                                    (minus as
+                                        number)) }}</h1>
+                        </div>
                     </div>
                 </div>
                 <div class="card">
-                    <DataTable :value="accounting?.AccountingDetail" tableStyle="min-width: 50rem" class="mt-4"
+                    <DataTable :value="accounting?.profitLooseInvoices" tableStyle="min-width: 50rem" class="mt-4"
                         :lazy="true">
-                        <Column field="name" header="Nama Akun"></Column>
-                        <Column header="Persentase">
+                        <Column header="Nomor Invoice">
                             <template #body="slotProps">
-                                <span>{{ slotProps.data.percentage }} %</span>
+                                <span>{{ slotProps.data?.invoice?.number }}</span>
                             </template>
                         </Column>
-                        <Column header="Sub Total">
+                        <template #empty>
+                            <h1 class="font-bold">TIDAK ADA DATA</h1>
+                        </template>
+                    </DataTable>
+                </div>
+                <div class="card">
+                    <DataTable :value="accounting?.additionals" tableStyle="min-width: 50rem" class="mt-4" :lazy="true">
+                        <Column header="Catatan">
                             <template #body="slotProps">
-                                <span>{{ formatRupiah(slotProps.data.subTotal) }}</span>
+                                <span>{{ slotProps.data?.note }}</span>
                             </template>
                         </Column>
-                        <Column header="Pengurangan">
+                        <Column header="Jumlah">
                             <template #body="slotProps">
-                                <span>{{ formatRupiah(slotProps.data.expenses) }}</span>
-                            </template>
-                        </Column>
-                        <Column header="Penghasilan">
-                            <template #body="slotProps">
-                                <span>{{ formatRupiah(slotProps.data.income) }}</span>
-                            </template>
-                        </Column>
-                        <Column header="#">
-                            <template #body="slotProps">
-                                <Button size="small" @click="handleEdit(slotProps.data)">
-                                    <i class="pi pi-eye"></i>
-                                </Button>
+                                <span>{{ formatRupiah(slotProps.data?.amount) }}</span>
                             </template>
                         </Column>
                         <template #empty>
@@ -104,28 +110,6 @@ const handleEdit = (data: Record<string, any>) => {
                     </DataTable>
                 </div>
             </div>
-            <Drawer v-model:visible="drawerAddAccount" header="Detail Akun" position="right"
-                class="min-w-[600px] max-w-[600px]">
-                <div class="grid gap-4 mb-4">
-                    <div class="flex flex-col gap-8">
-                        <CustomInputGroup :readonly="true" label="Nama Akun" type="string" placeholder="Nama Akun"
-                            v-model="dataDetail.name" class="w-full" />
-                    </div>
-                    <div class="flex flex-col gap-8">
-                        <CustomInputGroup :readonly="true" label="Jumlah Persentase" v-model="dataDetail.percentage"
-                            type="number" placeholder="Jumlah Persentase" class="w-full" />
-                    </div>
-                    <h1 class="font-bold" v-if="dataDetail.details.length > 0">Detail</h1>
-                    <div class="border p-4 rounded-md" v-if="dataDetail.details.length > 0">
-                        <div class="grid grid-cols-8 gap-2  mb-4" v-for="(detail, i) in dataDetail.details" :key="i">
-                            <InputText :readonly="true" type="text" class="col-span-4" placeholder="Keterangan"
-                                v-model="detail.note" />
-                            <InputText :readonly="true" type="number" class="col-span-4" placeholder="Jumlah"
-                                v-model="detail.amount" />
-                        </div>
-                    </div>
-                </div>
-            </Drawer>
         </div>
     </div>
 </template>

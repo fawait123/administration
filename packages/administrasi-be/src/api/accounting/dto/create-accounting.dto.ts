@@ -1,4 +1,4 @@
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   Allow,
   IsArray,
@@ -6,44 +6,30 @@ import {
   IsNumber,
   IsOptional,
   IsString,
-  ValidateNested,
 } from 'class-validator';
 
-class AccountingDetails {
+export class CreateAccountingDto {
   @IsNotEmpty()
   @IsString()
-  name: string;
+  accountName: string;
 
   @IsNotEmpty()
   @IsNumber()
   percentage: number;
 
-  @IsNotEmpty()
-  @IsNumber()
-  subTotal: number;
-
-  @IsNotEmpty()
-  @IsNumber()
-  expenses: number;
-
-  @IsNotEmpty()
-  @IsNumber()
-  income: number;
-
   @IsOptional()
-  expenseDetails: Record<string, any>;
-}
-
-export class CreateAccountingDto {
-  @IsNotEmpty()
-  @IsString()
-  invoiceId: string;
-
-  @Allow()
-  companyId: string;
-
-  @ValidateNested({ each: true })
   @IsArray()
-  @Type(() => AccountingDetails)
-  details: AccountingDetails[];
+  additionals?: []
+
+  @IsNotEmpty()
+  @IsArray()
+  profitAndLossInvoice: string[]
+
+  @IsNotEmpty()
+  @IsNumber()
+  total: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  profit: number;
 }
