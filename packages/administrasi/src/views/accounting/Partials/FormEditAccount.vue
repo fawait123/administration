@@ -40,14 +40,14 @@ const formRef = ref<{
 
 const getInvoice = async () => {
     const response = await doRequest({
-        url: 'invoice/all',
+        url: 'invoice/all/v2',
         method: 'GET',
     })
 
-    invoiceOptions.value = response.data.map((item: { id: string, number: string, total: string }) => {
+    invoiceOptions.value = response.data.map((item: { id: string, number: string, total: string, type: string, name: string }) => {
         return {
             id: item.id,
-            name: item.number,
+            name: `${item.number} (${item.name}) (${item.type})`,
             total: Number(item.total)
         }
     })

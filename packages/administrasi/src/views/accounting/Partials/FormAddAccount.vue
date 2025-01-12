@@ -12,6 +12,7 @@ import { useRouter } from 'vue-router';
 const toast = useToast()
 const route = useRouter()
 
+const taxRef = ref<number>(0)
 const invoiceOptions = ref<{
     id: string,
     name: string,
@@ -39,25 +40,35 @@ const formRef = ref<{
 
 const getInvoice = async () => {
     const response = await doRequest({
-        url: 'invoice/all',
+        url: 'invoice/all/v2',
         method: 'GET',
     })
 
-    invoiceOptions.value = response.data.map((item: { id: string, number: string, total: string }) => {
+    invoiceOptions.value = response.data.map((item: { id: string, number: string, total: string, type: string, name: string }) => {
         return {
             id: item.id,
-            name: item.number,
+            name: `${item.number} (${item.name}) (${item.type})`,
             total: Number(item.total)
         }
     })
 }
 
+const getTax = async () => {
+    try {
+        const response = await doRequest({
+            url: "/setting/tax",
+            method: "get"
+        })
+
+        taxRef.value = response.data.amount
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 const { validate, isValid, getErros, getError, scrolltoError } = useValidation(accountingSchema, formRef, {
     mode: 'lazy'
 });
-
-
-
 
 const handleSubmit = async () => {
     await validate();
@@ -97,6 +108,14 @@ const handlePlusMinus = (i: number) => {
 
 
 const total = computed(() => {
+    if (formRef.value.invoice.length == 0) {
+        return 0;
+    }
+    const findData = invoiceOptions.value.filter((value) => formRef.value.invoice.some(invoice => invoice == value.id))
+    return findData.reduce((prev, next) => prev + next.total, 0) - taxRef.value
+})
+
+const totalWithoutTax = computed(() => {
     const findData = invoiceOptions.value.filter((value) => formRef.value.invoice.some(invoice => invoice == value.id))
     return findData.reduce((prev, next) => prev + next.total, 0)
 })
@@ -112,6 +131,7 @@ const profit = computed(() => {
 
 onMounted(() => {
     getInvoice()
+    getTax()
 })
 
 
@@ -127,7 +147,8 @@ onMounted(() => {
             <div class="grid grid-cols-2 gap-3">
                 <div class="grid gap-3">
                     <h1 class="font-bold text-2xl">Total</h1>
-                    <h1 class="font-bold text-muted-color text-3xl">{{ formatRupiah(total) }}</h1>
+                    <h1 class="font-bold text-muted-color text-3xl">{{ formatRupiah(total) }} <span
+                            class="align-super text-sm">/ {{ formatRupiah(totalWithoutTax) }}</span></h1>
                 </div>
                 <div class="grid gap-3">
                     <h1 class="font-bold text-2xl">Pendapatan</h1>

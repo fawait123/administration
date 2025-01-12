@@ -22,7 +22,7 @@ import { ApproveInvoiceDto } from './dto/approve.dto';
 
 @Injectable()
 export class InvoiceService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService) { }
 
   // async validateWorkResult(createInvoiceDto: CreateInvoiceDto) {
   //   const data = [];
@@ -129,14 +129,14 @@ export class InvoiceService {
       const retensi =
         createInvoiceDto.invoiceRetensi.length > 0
           ? await t.invoiceRetensi.createMany({
-              data: createInvoiceDto.invoiceRetensi.map((item) => {
-                return {
-                  invoiceId: invoice.id,
-                  note: item.note,
-                  amount: item.amount,
-                };
-              }),
-            })
+            data: createInvoiceDto.invoiceRetensi.map((item) => {
+              return {
+                invoiceId: invoice.id,
+                note: item.note,
+                amount: item.amount,
+              };
+            }),
+          })
           : [];
 
       return { invoice, retensi };
@@ -285,12 +285,16 @@ export class InvoiceService {
         number: string;
         total: string;
         id: string;
+        type: string;
       }[]
     >`select 
                 i.number,
                 i.id,
+                i.type,
+                c.name,
                 (select sum(ia.total) from InvoiceActivity ia where ia.invoiceId = i.id) total
                 from Invoice i 
+                left join Company c on c.id = i.companyId
                 where i.status = 0
                 and i.type = 'ACTIVITY'
                 and i.companyId = ${company.id}
@@ -298,11 +302,48 @@ export class InvoiceService {
                 select 
                 i.number,
                 i.id,
+                i.type,
+                c.name,
                 (select sum(ia.amount) from InvoiceAdditional ia where ia.invoiceId = i.id) total
                 from Invoice i 
+                left join Company c on c.id = i.companyId
                 where i.status = 0
                 and i.type = 'ADDITIONAL'
                 and i.companyId  = ${company.id}`;
+    return new ResponseHelper({ data: allInvoice });
+  }
+
+
+
+  async getAllInvoicev2(company: Prisma.CompanyCreateInput) {
+    const allInvoice = await this.prismaService.$queryRaw<
+      {
+        number: string;
+        total: string;
+        id: string;
+        type: string;
+      }[]
+    >`select 
+                i.number,
+                i.id,
+                i.type,
+                c.name,
+                (select sum(ia.total) from InvoiceActivity ia where ia.invoiceId = i.id) total
+                from Invoice i 
+                left join Company c on c.id = i.companyId
+                where i.status = 0
+                and i.type = 'ACTIVITY'
+                UNION ALL
+                select 
+                i.number,
+                i.id,
+                i.type,
+                c.name,
+                (select sum(ia.amount) from InvoiceAdditional ia where ia.invoiceId = i.id) total
+                from Invoice i 
+                left join Company c on c.id = i.companyId
+                where i.status = 0
+                and i.type = 'ADDITIONAL'`;
     return new ResponseHelper({ data: allInvoice });
   }
 

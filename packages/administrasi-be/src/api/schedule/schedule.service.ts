@@ -47,6 +47,11 @@ export class ScheduleService {
         where ia2.status = 'NEEDAPPROVAL'
         group by number_invoice`;
 
+    await prisma.notification.deleteMany({
+      where: {
+        title: 'Pembayaran Invoice'
+      }
+    })
     await Promise.all(
       invoice.map(async (item) => {
         const [number_invoice, companyId] = item.number_invoice.split('|');
@@ -167,6 +172,11 @@ export class ScheduleService {
         and status_reject is null
       `;
 
+    await prisma.notification.deleteMany({
+      where: {
+        title: 'Pemberitahuan Pembayaran'
+      }
+    })
     const now = moment();
     await Promise.all(
       data.map(async (item) => {

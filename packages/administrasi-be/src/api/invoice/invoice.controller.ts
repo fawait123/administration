@@ -29,7 +29,7 @@ import { ApproveInvoiceDto } from './dto/approve.dto';
 @UseGuards(CompanyGuard)
 @Controller('invoice')
 export class InvoiceController {
-  constructor(private readonly invoiceService: InvoiceService) {}
+  constructor(private readonly invoiceService: InvoiceService) { }
 
   @Post()
   create(
@@ -60,6 +60,12 @@ export class InvoiceController {
   @Get('all')
   getAllInvoice(@CompanyContext() company: Prisma.CompanyCreateInput) {
     return this.invoiceService.getAllInvoice(company);
+  }
+
+
+  @Get('all/v2')
+  getAllInvoicev2(@CompanyContext() company: Prisma.CompanyCreateInput) {
+    return this.invoiceService.getAllInvoicev2(company);
   }
 
   @Post('adjusment')

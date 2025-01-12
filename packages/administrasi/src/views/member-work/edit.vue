@@ -268,11 +268,11 @@ const handleSubmit = async () => {
 };
 
 const calculateprice = (event: any, i: number) => {
-    formRef.value.activities[i].subTotal = event * +formRef.value.activities[i].wide;
+    formRef.value.activities[i].subTotal = Math.round(Number(event) * Number(formRef.value.activities[i].wide));
 };
 
 const calculateWide = (event: any, i: number) => {
-    formRef.value.activities[i].subTotal = event * +formRef.value.activities[i].price;
+    formRef.value.activities[i].subTotal = Math.round(Number(event) * Number(formRef.value.activities[i].price));
 };
 
 const handleSelectOption = (i: number, data: any) => {

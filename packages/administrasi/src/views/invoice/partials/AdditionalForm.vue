@@ -55,9 +55,6 @@ const getActivity = async () => {
         params: {
             page: 1, // Calculate page number
             limit: 100,
-            where: {
-                type: 'COMPANY'
-            }
         }
     });
 
@@ -208,57 +205,37 @@ defineExpose({ generateDataBon, formRef, selectedOptions, deleteModal });
             </div>
             <div class="card">
                 <div class="grid grid-cols-1">
-                    <CustomInputGroup type="text" placeholder="Masukan Nomor Invoice" label="Nomor Invoice" v-model="formRef.number" :invalid="!!getError('number')" :error-message="getError('number')" class-name="mb-8" />
+                    <CustomInputGroup type="text" placeholder="Masukan Nomor Invoice" label="Nomor Invoice"
+                        v-model="formRef.number" :invalid="!!getError('number')" :error-message="getError('number')"
+                        class-name="mb-8" />
                 </div>
             </div>
             <h6 class="font-semibold text-xl mb-2">INVOICE TAMBAHAN</h6>
             <div class="card relative" v-for="(bon, i) in formRef.invoiceAdditionals" :key="i">
                 <div class="grid grid-cols-2 gap-4">
                     <div class="flex flex-col gap-8">
-                        <CustomInputGroup
-                            label="Nomor BAP"
-                            :error-message="getErros('invoiceAdditionals', 'bapNumber', i)"
-                            :name="`bapNumber[${[i]}]`"
-                            :invalid="!!getErros('invoiceAdditionals', 'bapNumber', i)"
-                            v-model="bon.bapNumber"
-                            type="text"
-                            placeholder="Nomor BAP"
-                            class="w-full"
-                        />
-                        <CustomInputGroup
-                            label="Amount"
-                            :error-message="getErros('invoiceAdditionals', 'amount', i)"
-                            :name="`amount[${[i]}]`"
-                            :invalid="!!getErros('invoiceAdditionals', 'amount', i)"
-                            v-model="bon.amount"
-                            type="number"
-                            placeholder="Amount"
-                            class="w-full"
-                        />
+                        <CustomInputGroup label="Nomor BAP"
+                            :error-message="getErros('invoiceAdditionals', 'bapNumber', i)" :name="`bapNumber[${[i]}]`"
+                            :invalid="!!getErros('invoiceAdditionals', 'bapNumber', i)" v-model="bon.bapNumber"
+                            type="text" placeholder="Nomor BAP" class="w-full" />
+                        <CustomInputGroup label="Amount" :error-message="getErros('invoiceAdditionals', 'amount', i)"
+                            :name="`amount[${[i]}]`" :invalid="!!getErros('invoiceAdditionals', 'amount', i)"
+                            v-model="bon.amount" type="number" placeholder="Amount" class="w-full" />
                     </div>
                     <div class="flex flex-col gap-8">
-                        <CustomSelectGroup
-                            @valueChange="(value: any) => handleSelectOption(i, value)"
-                            :editable="true"
-                            label="Pilih Aktifitas"
-                            :options="availableOptions(i)"
-                            option-label="name"
-                            option-value="id"
-                            :error-message="getErros('invoiceAdditionals', 'activityId', i)"
-                            :name="`activity[${[i]}]`"
-                            :invalid="!!getErros('invoiceAdditionals', 'activityId', i)"
-                            v-model="bon.activityId"
-                            type="text"
-                            placeholder="Kegiatan"
-                            class="w-full"
-                        />
+                        <CustomSelectGroup @valueChange="(value: any) => handleSelectOption(i, value)" :editable="true"
+                            label="Pilih Aktifitas" :options="availableOptions(i)" option-label="name" option-value="id"
+                            :error-message="getErros('invoiceAdditionals', 'activityId', i)" :name="`activity[${[i]}]`"
+                            :invalid="!!getErros('invoiceAdditionals', 'activityId', i)" v-model="bon.activityId"
+                            type="text" placeholder="Kegiatan" class="w-full" />
                         <div class="flex items-center gap-2">
                             <Checkbox binary :inputId="`rent${i}`" v-model="formRef.invoiceAdditionals[i].rent" />
                             <label :for="`rent${i}`">Sewa</label>
                         </div>
                     </div>
                 </div>
-                <div class="w-10 h-10 rounded-full bg-primary text-white flex justify-center items-center absolute top-[-10px] right-[-5px] cursor-pointer" @click="handlePlusMinusBon(i, bon)" :class="i == 0 ? 'bg-primary' : 'bg-red-500'">
+                <div class="w-10 h-10 rounded-full bg-primary text-white flex justify-center items-center absolute top-[-10px] right-[-5px] cursor-pointer"
+                    @click="handlePlusMinusBon(i, bon)" :class="i == 0 ? 'bg-primary' : 'bg-red-500'">
                     <span :class="i == 0 ? 'pi pi-plus' : 'pi pi-minus'"></span>
                 </div>
             </div>
@@ -270,7 +247,8 @@ defineExpose({ generateDataBon, formRef, selectedOptions, deleteModal });
             </div>
         </div>
         <Dialog v-model:visible="deleteModal" :style="{ width: '450px' }" header="Hapus data ?" :modal="true">
-            <span>Apakah kamu yakin ingin menghapus data <span class="font-bold">(Data di dalam database akan ikut terhapus)</span>?</span>
+            <span>Apakah kamu yakin ingin menghapus data <span class="font-bold">(Data di dalam database akan ikut
+                    terhapus)</span>?</span>
 
             <template #footer>
                 <Button label="Yes" icon="pi pi-check" text @click="handleDelete" />

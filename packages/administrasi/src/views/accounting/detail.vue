@@ -48,7 +48,7 @@ const getData = async () => {
 }
 
 const minus = computed(() => {
-    return accounting.value?.additionals.reduce((prev, next) => prev + next.amount, 0)
+    return accounting.value?.additionals.reduce((prev, next) => prev + Number(next.amount), 0)
 })
 </script>
 
