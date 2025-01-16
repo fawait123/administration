@@ -119,14 +119,13 @@ export class ActivityService {
         }
       })
 
+      await transaction.activityGroup.deleteMany({
+        where: {
+          parentId: parent.id,
+        }
+      })
       const dataChildrens = []
       if (childrens.length > 0) {
-        await transaction.activityGroup.deleteMany({
-          where: {
-            parentId: parent.id,
-          }
-        })
-
         await Promise.all(
           childrens.map(async (child) => {
             const childActivity = await transaction.activityGroup.create({
@@ -157,10 +156,17 @@ export class ActivityService {
       throw new BadRequestException('Data pengguna tidak ditemukan');
     }
 
-    const deleteActivity = await this.prismaService.activity.delete({
-      where: {
-        id,
-      },
+    const deleteActivity = this.prismaService.$transaction(async (transaction) => {
+      await transaction.activityGroup.deleteMany({
+        where: {
+          parentId: activity.id
+        }
+      })
+      await transaction.activity.delete({
+        where: {
+          id,
+        },
+      })
     });
     return deleteActivity;
   }
