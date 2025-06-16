@@ -22,6 +22,10 @@ export class AuthMiddleware implements NestMiddleware {
 
     const [bearer, token] = autorization.split(' ');
 
+    if (bearer != 'Bearer') {
+      throw new BadRequestException('Token tidak valid');
+    }
+
     if (!token) {
       throw new BadRequestException('Silahkan login terlebih dahulu');
     }

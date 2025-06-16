@@ -4,6 +4,7 @@ import { PrismaClient } from '@prisma/client';
 import { NotificationService } from '../notification/notification.service';
 import { formatRupiah } from 'libs/helpers';
 import * as moment from 'moment';
+import { PushNotificationDto } from '../notification/dto/push.dto';
 
 @Injectable()
 export class ScheduleService {
@@ -49,33 +50,28 @@ export class ScheduleService {
 
     await prisma.notification.deleteMany({
       where: {
-        title: 'Pembayaran Invoice'
-      }
-    })
-    await Promise.all(
-      invoice.map(async (item) => {
-        const [number_invoice, companyId] = item.number_invoice.split('|');
-        await notificationService.push({
-          title: 'Pembayaran Invoice',
-          body: `<span class="font-bold text-muted-color">Pemberitahuan</span> untuk melakukan penagihan invoice nomor
+        title: 'Pembayaran Invoice',
+      },
+    });
+    const payload: PushNotificationDto[] = invoice.map((item) => {
+      const [number_invoice, companyId] = item.number_invoice.split('|');
+      return {
+        title: 'Pembayaran Invoice',
+        body: `<span class="font-bold text-muted-color">Pemberitahuan</span> untuk melakukan penagihan invoice nomor
                             <span class="font-bold text-primary">${number_invoice}</span> dengan total
                             aktifitas <span class="font-bold text-primary">${item.total_activity}</span> dan total penagihan sebesar <span class="font-bold text-primary">${formatRupiah(+item.total_amount)}</span> yang belum dibayar`,
-          date: moment().add('1', 'days').toDate(),
-          companyId: companyId,
-          additional: item.additional,
-        });
-        this.logger.debug(
-          `sending notification invoice ${item.number_invoice}`,
-        );
-      }),
-    );
-
-    this.logger.debug('Job Running successfully');
+        date: moment().add('1', 'days').toDate(),
+        companyId: companyId,
+        additional: item.additional,
+      };
+    });
+    notificationService.bulkPush(payload);
+    this.logger.debug(`[PEMBAYARAN INVOICE] sending notification`);
+    this.logger.debug('[PEMBERITAHUAN PEMBAYARAN] Job Running successfully');
   }
 
-  @Cron(CronExpression.EVERY_DAY_AT_1AM)
+  @Cron(CronExpression.EVERY_DAY_AT_2AM)
   async handleCronMemberWorkResult() {
-    console.log(moment().toDate());
     const prisma = new PrismaClient();
     const notificationService = new NotificationService();
 
@@ -93,7 +89,7 @@ export class ScheduleService {
         mwr.date, 
         e.name, 
         mwr.companyId, 
-        CONCAT(mwra2.plot, '|', a.name) additional, 
+        CONCAT(mwra2.plot, '|', a.name, '|', mwra2.wide) additional, 
         (
           select 
             t.status 
@@ -174,25 +170,25 @@ export class ScheduleService {
 
     await prisma.notification.deleteMany({
       where: {
-        title: 'Pemberitahuan Pembayaran'
-      }
-    })
+        title: 'Pemberitahuan Pembayaran',
+      },
+    });
     const now = moment();
-    await Promise.all(
-      data.map(async (item) => {
-        const [plot, activityName] = item.additional.split('|');
-        await notificationService.push({
-          title: 'Pemberitahuan Pembayaran',
-          body: `<span class="font-bold text-muted-color">Pemberitahuan</span> untuk melakukan pembayaran pekerja 
-                            <span class="font-bold text-primary">${item.name}</span> dengan aktifitas <span class="font-bold text-primary">${plot} ${activityName}</span>, Pembayaran belum dilakukan sejak <span class="font-bold text-primary">${now.diff(item.date, 'days')}</span> hari yang lalu`,
-          date: moment().add('1', 'days').toDate(),
-          companyId: item.companyId,
-          additional: item.additional,
-        });
-        this.logger.debug(`sending notification ${item.name}`);
-      }),
-    );
+    const payload: PushNotificationDto[] = data.map((item) => {
+      const [plot, activityName, wide] = item.additional.split('|');
+      return {
+        title: 'Pemberitahuan Pembayaran',
+        body: `<span class="font-bold text-muted-color">Pemberitahuan</span> untuk melakukan pembayaran pekerja 
+                            <span class="font-bold text-primary">${item.name}</span> dengan <span class="font-bold text-primary">Zona (${plot}), Aktifitas (${activityName}), Luas (${Math.round(Number(wide))} PETAK)</span>, Pembayaran belum dilakukan sejak <span class="font-bold text-primary">${now.diff(item.date, 'days')}</span> hari yang lalu`,
+        date: moment().add('1', 'days').toDate(),
+        companyId: item.companyId,
+        additional: item.additional,
+      };
+    });
 
-    this.logger.debug('Job Running successfully');
+    await notificationService.bulkPush(payload);
+    this.logger.debug(`[PEMBERITAHUAN PEMBAYARAN] sending notification`);
+
+    this.logger.debug('[PEMBERITAHUAN PEMBAYARAN] Job Running successfully');
   }
 }

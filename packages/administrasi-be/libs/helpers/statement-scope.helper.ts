@@ -1,4 +1,3 @@
-import { Prisma } from '@prisma/client';
 import { PaginationDto } from 'libs/dto/pagination.dto';
 
 export class StatementScopeHelper<T = any> {

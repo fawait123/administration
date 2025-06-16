@@ -4,7 +4,6 @@ import {
   ExecutionContext,
   Injectable,
 } from '@nestjs/common';
-import { Observable } from 'rxjs';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()

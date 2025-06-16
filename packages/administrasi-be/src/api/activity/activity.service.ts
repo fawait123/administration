@@ -10,53 +10,56 @@ import { UpdateActivityDto } from './dto/update-activity.dto';
 
 @Injectable()
 export class ActivityService {
-  constructor(private readonly prismaService: PrismaService) { }
+  constructor(private readonly prismaService: PrismaService) {}
   async create(createActivity: CreateActivityDto) {
-    const { childrens, ...data } = createActivity
+    const { childrens, ...data } = createActivity;
 
     const duplicate = await this.prismaService.activity.findFirst({
       where: {
-        name: data.name.trim()
-      }
-    })
-
-    if (duplicate) {
-      throw new BadRequestException(`Data ${data.name} sudah ditambahkan`)
-    }
-
-    const activity = await this.prismaService.$transaction(async (transaction) => {
-      const parent = await this.prismaService.activity.create({
-        data: data,
-      })
-
-      const dataChildrens = []
-      if (childrens.length > 0) {
-        await Promise.all(
-          childrens.map(async (child) => {
-            const childActivity = await this.prismaService.activityGroup.create({
-              data: {
-                parentId: parent.id,
-                childId: child
-              },
-            });
-            dataChildrens.push(childActivity);
-          }),
-        )
-      }
-
-      return { parent, dataChildrens }
+        name: data.name.trim(),
+      },
     });
 
-    return activity
+    if (duplicate) {
+      throw new BadRequestException(`Data ${data.name} sudah ditambahkan`);
+    }
+
+    const activity = await this.prismaService.$transaction(
+      async (transaction) => {
+        const parent = await transaction.activity.create({
+          data: data,
+        });
+
+        const dataChildrens = [];
+        if (childrens.length > 0) {
+          await Promise.all(
+            childrens.map(async (child) => {
+              const childActivity = await transaction.activityGroup.create({
+                data: {
+                  parentId: parent.id,
+                  childId: child,
+                },
+              });
+              dataChildrens.push(childActivity);
+            }),
+          );
+        }
+
+        return { parent, dataChildrens };
+      },
+    );
+
+    return activity;
   }
 
   async findAll(query: PaginationDto, company: Prisma.CompanyCreateInput) {
     if (query.all) {
       return all<Prisma.ActivityFindManyArgs>(
         this.prismaService.activity,
-        new StatementScopeHelper<Prisma.ActivityFindManyArgs>({ params: query }, [
-          'name',
-        ]),
+        new StatementScopeHelper<Prisma.ActivityFindManyArgs>(
+          { params: query },
+          ['name'],
+        ),
         {
           where: {
             companyId: company.id,
@@ -65,7 +68,6 @@ export class ActivityService {
         },
       );
     }
-
 
     return paginate<Prisma.ActivityFindManyArgs>(
       this.prismaService.activity,
@@ -78,16 +80,17 @@ export class ActivityService {
           ...query.where,
         },
         include: {
-          childrens: true
-        }
+          childrens: true,
+        },
       },
     );
   }
 
-  async getAll(params: PaginationDto) {
+  async getAll(params: PaginationDto, company: Prisma.CompanyCreateInput) {
     const activities = await this.prismaService.activity.findMany({
       where: {
         ...params.where,
+        ...(company && { companyId: company.id }),
       },
     });
 
@@ -109,38 +112,40 @@ export class ActivityService {
   }
 
   async update(id: string, updateActivityDto: UpdateActivityDto) {
-    const { childrens, ...data } = updateActivityDto
+    const { childrens, ...data } = updateActivityDto;
 
-    const activity = await this.prismaService.$transaction(async (transaction) => {
-      const parent = await transaction.activity.update({
-        data: data,
-        where: {
-          id
+    const activity = await this.prismaService.$transaction(
+      async (transaction) => {
+        const parent = await transaction.activity.update({
+          data: data,
+          where: {
+            id,
+          },
+        });
+
+        await transaction.activityGroup.deleteMany({
+          where: {
+            parentId: parent.id,
+          },
+        });
+        const dataChildrens = [];
+        if (childrens.length > 0) {
+          await Promise.all(
+            childrens.map(async (child) => {
+              const childActivity = await transaction.activityGroup.create({
+                data: {
+                  parentId: parent.id,
+                  childId: child,
+                },
+              });
+              dataChildrens.push(childActivity);
+            }),
+          );
         }
-      })
 
-      await transaction.activityGroup.deleteMany({
-        where: {
-          parentId: parent.id,
-        }
-      })
-      const dataChildrens = []
-      if (childrens.length > 0) {
-        await Promise.all(
-          childrens.map(async (child) => {
-            const childActivity = await transaction.activityGroup.create({
-              data: {
-                parentId: parent.id,
-                childId: child
-              },
-            });
-            dataChildrens.push(childActivity);
-          }),
-        )
-      }
-
-      return { parent, dataChildrens }
-    })
+        return { parent, dataChildrens };
+      },
+    );
 
     return activity;
   }
@@ -156,18 +161,20 @@ export class ActivityService {
       throw new BadRequestException('Data pengguna tidak ditemukan');
     }
 
-    const deleteActivity = this.prismaService.$transaction(async (transaction) => {
-      await transaction.activityGroup.deleteMany({
-        where: {
-          parentId: activity.id
-        }
-      })
-      await transaction.activity.delete({
-        where: {
-          id,
-        },
-      })
-    });
+    const deleteActivity = this.prismaService.$transaction(
+      async (transaction) => {
+        await transaction.activityGroup.deleteMany({
+          where: {
+            parentId: activity.id,
+          },
+        });
+        await transaction.activity.delete({
+          where: {
+            id,
+          },
+        });
+      },
+    );
     return deleteActivity;
   }
 }

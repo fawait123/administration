@@ -10,7 +10,7 @@ import { StatementScopeHelper } from 'libs/helpers/statement-scope.helper';
 
 @Injectable()
 export class MemberWorkResultService {
-  constructor(private readonly primaService: PrismaService) { }
+  constructor(private readonly primaService: PrismaService) {}
 
   async validateActivity(createMemberWorkResultDto: CreateMemberWorkResultDto) {
     const data: string[] = [];
@@ -23,7 +23,7 @@ export class MemberWorkResultService {
           }[]
         >`SELECT mr.plot, a.name FROM administration.MemberWorkResultActivity mr
                 left join Activity a on a.id = mr.activityId
-                where mr.plot = ${item.plot} and mr.ActivityId = ${item.activityId};`;
+                where mr.plot = ${item.plot} and mr.ActivityId = ${item.activityId} AND YEAR(mr.createdAt) >= YEAR(CURDATE()) - 4;`;
 
         if (duplicate.length > 0) {
           data.push(`<b>${duplicate[0].plot} ${duplicate[0].name}</b>`);
@@ -45,7 +45,7 @@ export class MemberWorkResultService {
       );
     }
 
-    await this.validateActivity(createMemberWorkResultDto)
+    await this.validateActivity(createMemberWorkResultDto);
 
     const check = await this.primaService.memberWorkResult.findFirst({
       where: {
@@ -73,7 +73,7 @@ export class MemberWorkResultService {
       });
 
       const payloadMemberWorkResultActivity: Prisma.MemberWorkResultActivityCreateManyInput[] =
-        createMemberWorkResultDto.activities.map((item) => {
+        createMemberWorkResultDto.activities.map((item, index) => {
           return {
             ActivityId: item.activityId,
             plot: item.plot,
@@ -82,6 +82,7 @@ export class MemberWorkResultService {
             subTotal: item.subTotal,
             wide: item.wide,
             memberWorkResultId: memberWorkResult.id,
+            ordered: index,
           };
         });
 
@@ -128,6 +129,9 @@ export class MemberWorkResultService {
         where: {
           companyId: company.id,
         },
+        orderBy: {
+          date: 'desc',
+        },
       },
     );
   }
@@ -158,6 +162,9 @@ export class MemberWorkResultService {
           activities: {
             include: {
               activity: true,
+            },
+            orderBy: {
+              ordered: 'asc',
             },
           },
           bon: true,

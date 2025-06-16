@@ -42,8 +42,11 @@ export class ActivityController {
   }
 
   @Get('all')
-  getAll(@Query() params: PaginationDto) {
-    return this.activityService.getAll(params);
+  getAll(
+    @Query() params: PaginationDto,
+    @CompanyContext() company: Prisma.CompanyCreateInput,
+  ) {
+    return this.activityService.getAll(params, company);
   }
 
   @Get(':id')

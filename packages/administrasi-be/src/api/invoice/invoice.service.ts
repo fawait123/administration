@@ -22,7 +22,7 @@ import { ApproveInvoiceDto } from './dto/approve.dto';
 
 @Injectable()
 export class InvoiceService {
-  constructor(private readonly prismaService: PrismaService) { }
+  constructor(private readonly prismaService: PrismaService) {}
 
   // async validateWorkResult(createInvoiceDto: CreateInvoiceDto) {
   //   const data = [];
@@ -129,14 +129,14 @@ export class InvoiceService {
       const retensi =
         createInvoiceDto.invoiceRetensi.length > 0
           ? await t.invoiceRetensi.createMany({
-            data: createInvoiceDto.invoiceRetensi.map((item) => {
-              return {
-                invoiceId: invoice.id,
-                note: item.note,
-                amount: item.amount,
-              };
-            }),
-          })
+              data: createInvoiceDto.invoiceRetensi.map((item) => {
+                return {
+                  invoiceId: invoice.id,
+                  note: item.note,
+                  amount: item.amount,
+                };
+              }),
+            })
           : [];
 
       return { invoice, retensi };
@@ -313,8 +313,6 @@ export class InvoiceService {
     return new ResponseHelper({ data: allInvoice });
   }
 
-
-
   async getAllInvoicev2(company: Prisma.CompanyCreateInput) {
     const allInvoice = await this.prismaService.$queryRaw<
       {
@@ -357,6 +355,9 @@ export class InvoiceService {
           include: {
             activity: true,
             details: true,
+          },
+          orderBy: {
+            zone: 'asc',
           },
         },
         invoiceAdditionals: {

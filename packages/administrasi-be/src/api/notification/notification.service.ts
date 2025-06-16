@@ -11,13 +11,17 @@ export class NotificationService {
     const prisma = new PrismaClient();
 
     const notification = await prisma.notification.create({
-      data: {
-        title: pushNotificationDto.title,
-        body: pushNotificationDto.body,
-        date: pushNotificationDto.date,
-        companyId: pushNotificationDto.companyId,
-        additional: pushNotificationDto.additional,
-      },
+      data: pushNotificationDto,
+    });
+
+    return notification;
+  }
+
+  async bulkPush(pushNotificationDto: PushNotificationDto[]) {
+    const prisma = new PrismaClient();
+
+    const notification = await prisma.notification.createMany({
+      data: pushNotificationDto,
     });
 
     return notification;
@@ -32,7 +36,6 @@ export class NotificationService {
     if (!query.where) {
       query.where = {};
     }
-
     return paginate<Prisma.NotificationFindManyArgs>(
       prisma.notification,
       new StatementScopeHelper<Prisma.NotificationFindManyArgs>(

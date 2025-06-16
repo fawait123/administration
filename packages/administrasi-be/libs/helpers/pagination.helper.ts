@@ -20,6 +20,10 @@ export const paginate = async <T = any>(
     additionalOptions.include = {};
   }
 
+  if (!additionalOptions.orderBy) {
+    additionalOptions.orderBy = {};
+  }
+
   const totalCount = await model.count({
     where: {
       ...options.paginationOptions().where,
@@ -36,6 +40,9 @@ export const paginate = async <T = any>(
     },
     include: {
       ...additionalOptions.include,
+    },
+    orderBy: {
+      ...additionalOptions.orderBy,
     },
   });
 

@@ -4,7 +4,6 @@ import { CompanyContext } from 'libs/decorators/company.decorator';
 import { Prisma } from '@prisma/client';
 import { CompanyGuard } from 'libs/guard/company-guard/company.guard';
 import { PaginationDto } from 'libs/dto/pagination.dto';
-import { NotificationFilter } from './dto/push.dto';
 
 @UseGuards(CompanyGuard)
 @Controller('notification')
